@@ -1,9 +1,15 @@
 /**
  * http://usejsdoc.org/
  */
+const knex = require('knex')(require('./knexfile'))
+
 module.exports = {
-		createUser ({username, password}) {
+		createUser ({username, email, password}) {
 			 console.log(`Add user ${username} with password ${password}`)
-			    return Promise.resolve()
+			 return knex('user').insert({
+				 username,
+				 email,
+				 password
+			 })
 		}
 }
