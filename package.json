@@ -1,0 +1,27 @@
+{
+  "name": "podcastdaoplatform",
+  "version": "1.0.0",
+  "description": "A Podcasting Platform in the Structure of a Decentralized Autonomous Organization",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "knex": "^0.16.3",
+    "mysql": "^2.16.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erypel/PodcastDAOPlatform.git"
+  },
+  "author": "Evan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/erypel/PodcastDAOPlatform/issues"
+  },
+  "homepage": "https://github.com/erypel/PodcastDAOPlatform#readme"
+}
