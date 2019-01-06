@@ -15,19 +15,41 @@ module.exports = {
 				 salt,
 				 encrypted_password: hash
 			 })
-		}
+		},
+		authenticate ({ username, password }) {
+		    console.log(`Authenticating user ${username}`)
+		    return knex('user').where({ username })
+		      .then(([user]) => {
+		        if (!user) return { success: false }
+		        const { hash } = saltHashPassword({
+		          password,
+		          salt: user.salt
+		        })
+		        return { success: hash === user.encrypted_password }
+		      })
+		  }
 }
 
-// we want to store encrypted passwords in the DB
-function saltHashPassword(password){
-	const salt = randomString()
-	const hash = crypto.createHmac('sha512', salt).update(password)
-	
-	return {
-		salt,
-		hash: hash.digest('hex')
+/** 
+ * we want to store encrypted passwords in the DB
+ * Accept a salt and only generate one if none is 
+ * supplied
+ * 
+ * @param {password:MISSING,salt:randomString()}
+ * @returns
+ */
+function saltHashPassword ({
+	  password,
+	  salt = randomString()
+	}) {
+	  const hash = crypto
+	    .createHmac('sha512', salt)
+	    .update(password)
+	  return {
+	    salt,
+	    hash: hash.digest('hex')
+	  }
 	}
-}
 
 function randomString(){
 	return crypto.randomBytes(4).toString('hex')
