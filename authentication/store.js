@@ -5,6 +5,7 @@ const crypto = require('crypto')
 const knex = require('knex')(require('../config/knexfile'))
 
 module.exports = {
+		randomString, //put this somewhere else
 		saltHashPassword,
 		createUser ({username, email, password}) {
 			 console.log(`Add user ${username}`)
@@ -25,7 +26,10 @@ module.exports = {
 		          password,
 		          salt: user.salt
 		        })
-		        return { success: hash === user.encrypted_password }
+		        return { 
+		        	success: hash === user.encrypted_password,
+		        	user: user 
+		        }
 		      })
 		  }
 }
