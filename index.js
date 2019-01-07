@@ -23,6 +23,10 @@ app.get('/createUser', function(req, res) {
 	res.render("createUser")
 })
 
+app.get('/dashboard', function(req, res) {
+	res.render("dashboard")
+})
+
 app.post('/createUser', (req, res) => {
 	store.createUser({
 		username: req.body.username,
