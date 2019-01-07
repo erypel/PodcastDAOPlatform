@@ -2,7 +2,7 @@
  * http://usejsdoc.org/
  */
 const crypto = require('crypto')
-const knex = require('knex')(require('./knexfile'))
+const knex = require('knex')(require('../config/knexfile'))
 
 module.exports = {
 		saltHashPassword,

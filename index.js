@@ -3,11 +3,24 @@
  */
 const express = require('express')
 const bodyParser = require('body-parser')
-const store = require('./store')
+const store = require('./authentication/store')
 const app = express()
+app.set('view engine', 'ejs');
 
-app.use(express.static('public'))
+app.use(express.static('authentication'))
 app.use(bodyParser.json())
+
+app.get('/', function(req, res) {
+	res.render("login")
+})
+
+app.get('/login', function(req, res) {
+	res.render("login")
+})
+
+app.get('/createUser', function(req, res) {
+	res.render("createUser")
+})
 
 app.post('/createUser', (req, res) => {
 	store.createUser({

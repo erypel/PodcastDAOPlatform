@@ -2,15 +2,9 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>Create User/Login</title>
+<title>Insert title here</title>
 </head>
 <body>
-	<form class="Login">
-		<h1>Login</h1>
-		<input type="text" class="username" placeholder="username"> <input
-			type="password" class="password" placeholder="password"> <input
-			type="submit" value="Login">
-	</form>
 	<form class="CreateUser">
 		<h1>Create a new user</h1>
 		<input type="text" class="username" placeholder="username"> <input
@@ -18,6 +12,10 @@
 			type="password" class="password" placeholder="password"> <input
 			type="submit" value="Create user">
 	</form>
-	<script src="/app.js"></script>
+	<br>
+	<form action="/login" method = "get">
+          <button>Return to Login</button>
+    </form> 
+	<script src="/routes.js"></script>
 </body>
 </html>
