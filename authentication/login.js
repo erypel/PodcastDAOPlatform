@@ -8,7 +8,7 @@ Login.addEventListener('submit', (e) => {
   const password = Login.querySelector('.password').value
   post('/login', { username, password })
     .then(({ status }) => {
-      if (status === 200) alert('login success')
+      if (status === 200) window.location.href = "http://localhost:3000/dashboard"
       else alert('login failed')
     })
 })

@@ -2,7 +2,7 @@
   "name": "podcastdaoplatform",
   "version": "1.0.0",
   "description": "A Podcasting Platform in the Structure of a Decentralized Autonomous Organization",
-  "main": "index.js",
+  "main": "app.js",
   "dependencies": {
     "7": "0.0.1",
     "body-parser": "^1.18.3",
