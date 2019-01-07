@@ -1,5 +1,6 @@
 /**
  * This is the entry point to the application
+ * Using nodemon to start app server
  */
 const express = require('express')
 const bodyParser = require('body-parser')
