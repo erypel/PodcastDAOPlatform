@@ -86,6 +86,10 @@ router.get('/dashboard', requireLogin, function(req, res) {
 	res.render('dashboard')
 })
 
+router.get('/upload', requireLogin, (req, res) => {
+	res.render('upload')
+})
+
 router.post('/createUser', (req, res) => {
 	store.createUser({
 		username: req.body.username,
