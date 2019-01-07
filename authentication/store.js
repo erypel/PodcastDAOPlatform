@@ -8,7 +8,7 @@ module.exports = {
 		saltHashPassword,
 		createUser ({username, email, password}) {
 			 console.log(`Add user ${username}`)
-			 const {salt, hash} = saltHashPassword(password)
+			 const {salt, hash} = saltHashPassword({password})
 			 return knex('user').insert({
 				 username,
 				 email,
