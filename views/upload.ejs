@@ -5,19 +5,19 @@
 <title>Upload</title>
 </head>
 <body>
-	<form action="uploadPodcast" method="post" enctype="multipart/form-data">
+	<form class="UploadPodcast" method="post" enctype="multipart/form-data">
 		<table border="0">
 			<tr>
 				<td>Episode Name: </td>
-				<td><input type="text" name="episodeName" size="50"/></td>
+				<td><input type="text" class="episodeName" size="50"/></td>
 			</tr>
 			<tr>
 				<td>Description: </td>
-				<td><input type="text" name="episodeDescription" size="50"/></td>
+				<td><input type="text" class="episodeDescription" size="50"/></td>
 			</tr>
 			<tr>
 				<td>Audio File: </td>
-				<td><input type="file" name="podcastEpisode" size="50"/></td>
+				<td><input type="file" class="podcastEpisode" size="50"/></td>
 			</tr>
 			<tr>
             	<td colspan="2">
@@ -33,5 +33,6 @@
 	<form action="/logout" method = "get">
           <button>Logout</button>
     </form> 
+    <script src="uploadPodcast.js"></script>
 </body>
 </html>

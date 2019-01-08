@@ -4,10 +4,12 @@
 const express = require('express')
 const router = express.Router()
 const store = require('./authentication/store')
+const podcastStore = require('./podcast/podcastStore')
 const session = require('client-sessions')
 const bodyParser = require('body-parser')
 
 router.use(express.static('authentication'))
+router.use(express.static('podcast'))
 router.use(bodyParser.json())
 
 //Middle ware that is specific to this router
@@ -31,7 +33,7 @@ router.use(function(req, res, next) {
 	if(req.session && req.session.user){
 		//TODO look for user in DB
 		/*
-		 * if user is in db
+		 * if(store.getUser(req.session.user.username)
 		 * 		req.user = user;
 		 * 		delete req.user.password //delete password from the session
 		 * 		req.session.user = user //refresh session value
@@ -106,6 +108,24 @@ router.post('/login', (req, res) => {
 		if(success) {
 			// set cookie with the user's info. Might want to use something else later
 			req.session.user = user
+			res.sendStatus(200)
+		}
+		else res.sendStatus(401)
+	})
+})
+
+router.post('/uploadPodcast', (req, res) => {
+	//console.log('router '+`${req.session}`)
+	//let userID = store.getUserID(req.session.username)
+	let one = 1
+	podcastStore.savePodcastToDB({
+		episodeName: req.body.episodeName, 
+		description: req.body.episodeDescription, 
+		episode: req.body.podcastEpisode,
+		ownerID: one
+		//userID
+	}).then(({success}) => {
+		if(success) {
 			res.sendStatus(200)
 		}
 		else res.sendStatus(401)

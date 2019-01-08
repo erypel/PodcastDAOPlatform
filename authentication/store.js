@@ -31,6 +31,15 @@ module.exports = {
 		        	user: user 
 		        }
 		      })
+		  },
+		  getUser(username){
+			  return knex('user').where({username}).first()
+		  },
+		  getUserID(username) {
+			  console.log(`${username}`)
+			  let test = knex('user').where({username}).select('id')
+			  console.log('test ' + test)
+			  return knex('user').select('id').where({username}).first()
 		  }
 }
 
