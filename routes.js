@@ -7,10 +7,13 @@ const store = require('./authentication/store')
 const podcastStore = require('./podcast/podcastStore')
 const session = require('client-sessions')
 const bodyParser = require('body-parser')
+const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 
 router.use(express.static('authentication'))
 router.use(express.static('podcast'))
 router.use(bodyParser.json())
+router.use(fileupload())
+
 
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
@@ -114,10 +117,13 @@ router.post('/login', (req, res) => {
 	})
 })
 
-router.post('/uploadPodcast', (req, res) => {
+router.post('/uploadPodcast', (req, res, next) => {
 	//console.log('router '+`${req.session}`)
 	//let userID = store.getUserID(req.session.username)
+	//TODO get userID
+	console.log("files " + req.files)
 	let one = 1
+	podcastStore.uploadPodcast(req, res)
 	podcastStore.savePodcastToDB({
 		episodeName: req.body.episodeName, 
 		description: req.body.episodeDescription, 
@@ -126,7 +132,7 @@ router.post('/uploadPodcast', (req, res) => {
 		//userID
 	}).then(({success}) => {
 		if(success) {
-			res.sendStatus(200)
+			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
 		else res.sendStatus(401)
 	})
