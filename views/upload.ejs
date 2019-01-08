@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Upload</title>
+</head>
+<body>
+	<form action="/uploadPodcast" method="post" enctype="multipart/form-data">
+		<table border="0">
+			<tr>
+				<td>Episode Name: </td>
+				<td><input type="text" name="episodeName" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Description: </td>
+				<td><input type="text" name="episodeDescription" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Audio File: </td>
+				<td><input type="file" name="fileUpload" size="50"/></td>
+			</tr>
+			<tr>
+            	<td colspan="2">
+            		<input type="submit" value="Save">
+                </td>
+            </tr>
+		</table>
+	</form>
+	<br>
+	<form action="/dashboard" method = "get">
+          <button>Back</button>
+    </form> 
+	<form action="/logout" method = "get">
+          <button>Logout</button>
+    </form>
+</body>
+</html>
