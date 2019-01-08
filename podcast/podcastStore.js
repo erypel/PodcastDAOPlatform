@@ -13,7 +13,7 @@ function saveFileToFileStore(file){
 	let bufDataFile = new Buffer(file.data, "utf-8"); //TODO deprecated
 	
 	let target_path = constructPathToPodcastOnFileStore(file.name)
-	 fs.writeFile(target_path, bufDataFile,  function(err) {
+	fs.writeFile(target_path, bufDataFile,  function(err) {
       if (err) {
          return console.error(err);
       }
@@ -21,6 +21,7 @@ function saveFileToFileStore(file){
          console.log("Data written successfully !");
       }  
    })
+   return target_path
 }
 
 function uploadPodcast(req, res){
@@ -32,12 +33,13 @@ function uploadPodcast(req, res){
 		}
 	
 	file = req.files.fileUpload
-	saveFileToFileStore(file)
+	return saveFileToFileStore(file)
 }
 
 module.exports = {
-	savePodcastToDB({episode_name, description, episode, owner_id}) {
-		let path = constructPathToPodcastOnFileStore(episode_name)
+	savePodcastToDB(req, res, {episode_name, description, owner_id}) {
+		console.log("owner id " + owner_id)
+		let path = uploadPodcast(req, res)
 		return knex('podcast').insert({
 			episode_name,
 			description,

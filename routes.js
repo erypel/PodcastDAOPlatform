@@ -118,18 +118,10 @@ router.post('/login', (req, res) => {
 })
 
 router.post('/uploadPodcast', (req, res, next) => {
-	//console.log('router '+`${req.session}`)
-	//let userID = store.getUserID(req.session.username)
-	//TODO get userID
-	console.log("files " + req.files)
-	let one = 1
-	podcastStore.uploadPodcast(req, res)
-	podcastStore.savePodcastToDB({
-		episodeName: req.body.episodeName, 
-		description: req.body.episodeDescription, 
-		episode: req.body.podcastEpisode,
-		ownerID: one
-		//userID
+	podcastStore.savePodcastToDB(req, res, {
+		episode_name: req.body.episodeName, 
+		description: req.body.episodeDescription,
+		owner_id: req.session.user.id
 	}).then(({success}) => {
 		if(success) {
 			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
