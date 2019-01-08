@@ -1,13 +1,12 @@
 /**
- * This is the routes file
+ * http://usejsdoc.org/
  */
 const express = require('express')
 const router = express.Router()
+const userStore = require('./store')
 const session = require('client-sessions')
 const bodyParser = require('body-parser')
-const userStore = require('./authentication/store')
 
-router.use(express.static('authentication'))
 router.use(bodyParser.json())
 
 //DUPLICATE
@@ -68,13 +67,41 @@ function requireLogin (req, res, next) {
 
 //END DUPLICATE
 
-router.get('/', function(req, res) {
+router.get('/login', function(req, res) {
 	res.render("login")
 })
 
-router.get('/dashboard', requireLogin, function(req, res) {
-	//TODO bug where user logs out and can navigate back to dashboard with back button
-	res.render('dashboard')
+router.get('/logout', function(req, res){
+	req.session.reset()
+	res.redirect('/')
+})
+
+router.get('/createUser', function(req, res) {
+	res.render("createUser")
+})
+
+router.post('/createUser', (req, res) => {
+	console.log("here")
+	console.log(req)
+	userStore.createUser({
+		username: req.body.username,
+		email: req.body.email,
+		password: req.body.password
+	}).then(() => res.sendStatus(200))
+})
+
+router.post('/login', (req, res) => {
+	userStore.authenticate({
+		username: req.body.username,
+		password: req.body.password
+	}).then(({success, user}) => {
+		if(success) {
+			// set cookie with the user's info. Might want to use something else later
+			req.session.user = user
+			res.sendStatus(200)
+		}
+		else res.sendStatus(401)
+	})
 })
 
 module.exports = router;
