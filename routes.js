@@ -4,16 +4,12 @@
 const express = require('express')
 const router = express.Router()
 const store = require('./authentication/store')
-const podcastStore = require('./podcast/podcastStore')
 const session = require('client-sessions')
 const bodyParser = require('body-parser')
-const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 
 router.use(express.static('authentication'))
-router.use(express.static('podcast'))
-router.use(bodyParser.json())
-router.use(fileupload())
 
+router.use(bodyParser.json())
 
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
@@ -46,6 +42,7 @@ router.use(function(req, res, next) {
 		//finish processing the middleware and run the route
 		req.user = req.session.user
 		delete req.user.password
+		delete req.user.encrypted_password
 		next()
 	} else {
 		next()
@@ -91,10 +88,6 @@ router.get('/dashboard', requireLogin, function(req, res) {
 	res.render('dashboard')
 })
 
-router.get('/upload', requireLogin, (req, res) => {
-	res.render('upload')
-})
-
 router.post('/createUser', (req, res) => {
 	store.createUser({
 		username: req.body.username,
@@ -112,19 +105,6 @@ router.post('/login', (req, res) => {
 			// set cookie with the user's info. Might want to use something else later
 			req.session.user = user
 			res.sendStatus(200)
-		}
-		else res.sendStatus(401)
-	})
-})
-
-router.post('/uploadPodcast', (req, res, next) => {
-	podcastStore.savePodcastToDB(req, res, {
-		episode_name: req.body.episodeName, 
-		description: req.body.episodeDescription,
-		owner_id: req.session.user.id
-	}).then(({success}) => {
-		if(success) {
-			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
 		else res.sendStatus(401)
 	})
