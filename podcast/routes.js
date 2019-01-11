@@ -65,8 +65,7 @@ router.get('/upload', requireLogin, (req, res) => {
 router.get('/podcast', requireLogin, (req, res) => {
 	podcastStore.getAllPodcasts(function(podcasts){
 		res.render('podcast', {
-			podcasts: podcasts,
-			test: "test"
+			podcasts: podcasts
 		})
 	})
 })
