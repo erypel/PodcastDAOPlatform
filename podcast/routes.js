@@ -62,6 +62,15 @@ router.get('/upload', requireLogin, (req, res) => {
 	res.render('upload')
 })
 
+router.get('/podcast', requireLogin, (req, res) => {
+	podcastStore.getAllPodcasts(function(podcasts){
+		res.render('podcast', {
+			podcasts: podcasts,
+			test: "test"
+		})
+	})
+})
+
 router.post('/uploadPodcast', (req, res, next) => {
 	podcastStore.savePodcastToDB(req, res, {
 		episode_name: req.body.episodeName, 

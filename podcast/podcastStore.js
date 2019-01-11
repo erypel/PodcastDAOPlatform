@@ -36,6 +36,26 @@ function uploadPodcast(req, res){
 	return saveFileToFileStore(file)
 }
 
+function getAllPodcasts(callback){
+	selectAllPodcasts(function(podcasts){
+		callback(podcasts);
+	})
+}
+
+/**
+ * makes call to the DB to retrieve the podcasts
+ * @returns
+ */
+function selectAllPodcasts(callback){
+	let podcasts = []
+	knex.select().table('podcast').then(function(rowDataPacket){
+		rowDataPacket.forEach(function(podcast){
+			podcasts.push(podcast)
+		})
+		callback(podcasts)
+	})
+}
+
 module.exports = {
 	savePodcastToDB(req, res, {episode_name, description, owner_id}) {
 		console.log("owner id " + owner_id)
@@ -49,5 +69,6 @@ module.exports = {
 	        return { success: true }
 	      })
 	},
-	uploadPodcast
+	uploadPodcast,
+	getAllPodcasts
 }
