@@ -3,7 +3,7 @@
  */
 const express = require('express')
 const fs = require('fs')
-const feed = require('feed')
+const Feed = require('feed').Feed
 const bodyParser = require('body-parser')
 const rssStore = require('./rssStore')
 const knex = require('knex')(require('../knexfile'))
@@ -62,20 +62,31 @@ router.get('/rss', requireLogin, (req, res) => {
 })
 
 router.post('/createRSS', (req, res, next) => {
-	let path = generatePath()
+	let xmlPath = generatePath(req.session.user.id, req.body.title)
+	
 	//TODO there is probably a more elegant way to do this
 	let explicit = req.body.explicit
 	if(explicit == 'on')
 		explicit = true
 	else if(explicit == 'off')
 		explicit = false
+		
+	generateXML({
+		title: req.body.title, 
+		description: req.body.description,
+		language: req.body.language,
+		copyright: req.body.copyright,
+		explicit: explicit,
+		path: xmlPath,
+		owner_id: req.session.user.id
+	})
 	rssStore.saveToDB(req, res, {
 		title: req.body.title, 
 		description: req.body.description,
 		language: req.body.language,
 		copyright: req.body.copyright,
 		explicit: explicit,
-		path: '/test',
+		path: xmlPath,
 		owner_id: req.session.user.id
 	}).then(({success}) => {
 		if(success) {
@@ -85,9 +96,25 @@ router.post('/createRSS', (req, res, next) => {
 	})
 })
 
+function generateXML(data)
+{
+	//This is the minimum required amount of data for an RSS field
+	//TODO may consider adding additional fields
+	let feed = new Feed({
+		title: data.title,
+		link: data.path, //TODO need to think about this
+		description: data.description
+	})
+	
+	let rssdoc = feed.rss2()
+	fs.writeFile(data.path, rssdoc, function(err) {
+		if(err) return console.log(err)
+	})
+}
+
 //TODO move
-function generatePath(){
-	return ''
+function generatePath(userID, title){
+	return './rssfeedxml/' + userID + '.xml'
 }
 
 module.exports = router;

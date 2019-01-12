@@ -62,3 +62,6 @@ typings/
 
 # any podcast file uploads that the platform handles
 uploads/
+
+# generated rss feeds
+rssfeedxml/
