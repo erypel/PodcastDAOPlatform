@@ -96,6 +96,7 @@ router.post('/createRSS', (req, res, next) => {
 	})
 })
 
+//TODO move
 function generateXML(data)
 {
 	//This is the minimum required amount of data for an RSS field
