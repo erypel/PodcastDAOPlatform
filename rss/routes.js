@@ -5,6 +5,8 @@ const express = require('express')
 const fs = require('fs')
 const feed = require('feed')
 const bodyParser = require('body-parser')
+const rssStore = require('./rssStore')
+const knex = require('knex')(require('../knexfile'))
 const router = express.Router();
 
 //BEGIN DUPLICATE METHODS THAT SHOULD BE CONSOLODATED WITH WHATS IN ROUTES.JS
@@ -58,5 +60,34 @@ if (!req.user) {
 router.get('/rss', requireLogin, (req, res) => {
 	res.render('rss')
 })
+
+router.post('/createRSS', (req, res, next) => {
+	let path = generatePath()
+	//TODO there is probably a more elegant way to do this
+	let explicit = req.body.explicit
+	if(explicit == 'on')
+		explicit = true
+	else if(explicit == 'off')
+		explicit = false
+	rssStore.saveToDB(req, res, {
+		title: req.body.title, 
+		description: req.body.description,
+		language: req.body.language,
+		copyright: req.body.copyright,
+		explicit: explicit,
+		path: '/test',
+		owner_id: req.session.user.id
+	}).then(({success}) => {
+		if(success) {
+			res.send('Success!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+		}
+		else res.sendStatus(401)
+	})
+})
+
+//TODO move
+function generatePath(){
+	return ''
+}
 
 module.exports = router;

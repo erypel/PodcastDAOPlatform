@@ -58,7 +58,6 @@ function selectAllPodcasts(callback){
 
 module.exports = {
 	savePodcastToDB(req, res, {episode_name, description, owner_id}) {
-		console.log("owner id " + owner_id)
 		let path = uploadPodcast(req, res)
 		return knex('podcast').insert({
 			episode_name,
