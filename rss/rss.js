@@ -14,6 +14,28 @@ function appendToRSS(podcast){
 	})
 }
 
+function generateXML(data)
+{
+	//This is the minimum required amount of data for an RSS field
+	//TODO may consider adding additional fields
+	let feed = new Feed({
+		title: data.title,
+		link: data.path, //TODO need to think about this
+		description: data.description
+	})
+	
+	let rssdoc = feed.rss2()
+	fs.writeFile(data.path, rssdoc, function(err) {
+		if(err) return console.log(err)
+	})
+}
+
+function generatePath(userID, title){
+	return './rssfeedxml/' + userID + '.xml'
+}
+
 module.exports = {
-		appendToRSS: appendToRSS
+		appendToRSS: appendToRSS,
+		generateXML: generateXML,
+		generatePath: generatePath
 }
