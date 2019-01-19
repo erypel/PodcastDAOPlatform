@@ -71,8 +71,8 @@ module.exports = {
 			description,
 			path,
 			owner_id
-		}).then(() => {
-	        return { success: true }
+		}, 'id').then((result) => {
+	        return { success: true, id: result[0] }
 	      })
 	},
 	uploadPodcast,

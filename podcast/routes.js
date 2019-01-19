@@ -6,6 +6,7 @@ const router = express.Router()
 const bodyParser = require('body-parser')
 const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 const podcastStore = require('./podcastStore')
+const rssStore = require('../rss/rssStore')
 
 router.use(fileupload())
 router.use(bodyParser.json())
@@ -75,8 +76,19 @@ router.post('/uploadPodcast', (req, res, next) => {
 		episode_name: req.body.episodeName, 
 		description: req.body.episodeDescription,
 		owner_id: req.session.user.id
-	}).then(({success}) => {
+	}).then(({success, id}) => {
 		if(success) {
+			let podcastID = id
+			let rssFeedID = rssStore.getFeedID(req.session.user.id).then((rssFeedID) => {
+				rssStore.saveRssMessageToDB(req, res, {
+						episodeName: req.body.episodeName,
+						description: req.body.episodeDescription,
+						path: '/',
+						owner_id: req.session.user.id,
+						rssfeed_id: rssFeedID,
+						podcast_id: podcastID
+					}
+			)})	
 			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
 		else res.sendStatus(401)

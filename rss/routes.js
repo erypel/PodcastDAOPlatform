@@ -80,7 +80,7 @@ router.post('/createRSS', (req, res, next) => {
 		path: xmlPath,
 		owner_id: req.session.user.id
 	})
-	rssStore.saveToDB(req, res, {
+	rssStore.saveRssFeedToDB(req, res, {
 		title: req.body.title, 
 		description: req.body.description,
 		language: req.body.language,
