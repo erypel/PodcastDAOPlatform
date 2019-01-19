@@ -10,6 +10,7 @@ app.set('view engine', 'ejs');
 app.use(require('./routes'))
 app.use(require('./authentication/routes'))
 app.use(require('./podcast/routes'))
+app.use(require('./rss/routes'))
 
 app.listen(3000, () => {
 	console.log('Server running on http://localhost:3000')
