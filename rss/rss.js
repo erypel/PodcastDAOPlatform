@@ -34,14 +34,25 @@ function getFilename(userID, podcast)
 {
 	let rssLocation = './rssfeedxml/' + userID + '.xml'
 	console.log("RSS " + rssLocation)
+	let itemXML = '\t\t<item>\n\t\t\t<title>' + podcast.episode_name + '</title>\n\t\t\t<description>'+podcast.description+'</description>\n\t\t\t<link>/</link>\n\t\t</item>'
+
+	let filename = './rssfeedxml/' + userID + '.xml', buffer = new Buffer(itemXML+'\n\t</channel>\n</rss>'), fileSize = fs.statSync(filename)['size']
+	fs.open(filename, 'r+', function(err, fd) {
+		fs.write(fd, buffer, 0, buffer.length, fileSize-18, function(err){
+			if(err) console.log(err)
+			console.log('done')
+		})
+	})
+	/*
 	fs.readFile('./rssfeedxml/' + userID + '.xml', "utf-8", function(err, data) {
 		console.log("Data " + data)
+		let item = {title:podcast.episode_name, description:podcast.description, link:"/"}
 		xml2js(data, function(err, result) {
 			console.log("result: " + result)
 			addPodcastToResult(result, podcast)
 			return result
 		})
-	})
+	})*/
 }
 
 function addPodcastToResult(result, podcast){
