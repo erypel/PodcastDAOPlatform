@@ -3,6 +3,7 @@
  */
 const knex = require('knex')(require('../knexfile'))
 const fs = require('fs'); //use the file system so we can save files
+const rss = require('../rss/rss')
 
 //TODO this can be better
 function constructPathToPodcastOnFileStore(episodeName){
@@ -56,17 +57,22 @@ function selectAllPodcasts(callback){
 	})
 }
 
+function appendToRSS(podcast){
+	rss.appendToRSS(podcast)
+}
+
 module.exports = {
 	savePodcastToDB(req, res, {episode_name, description, owner_id}) {
-		console.log("owner id " + owner_id)
+		console.log(rss)
+		appendToRSS({episode_name, description, owner_id})
 		let path = uploadPodcast(req, res)
 		return knex('podcast').insert({
 			episode_name,
 			description,
 			path,
 			owner_id
-		}).then(() => {
-	        return { success: true }
+		}, 'id').then((result) => {
+	        return { success: true, id: result[0] }
 	      })
 	},
 	uploadPodcast,
