@@ -4,6 +4,11 @@
 const knex = require('knex')(require('../knexfile'))
 
 module.exports = {
+	getWalletID(ownerID){
+		return knex.select('id').table('wallet').where('owner_id', ownerID).then(function(rowDataPacket){
+			return rowDataPacket[0].id
+		})
+	},
 	getUserBalance(ownerID){
 		return knex.select('funds').table('wallet').where('owner_id', ownerID).then(function(rowDataPacket){
 			return rowDataPacket[0].funds

@@ -4,6 +4,7 @@
 const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
+const walletStore = require('./walletStore')
 
 router.use(bodyParser.json())
 
@@ -55,8 +56,26 @@ function requireLogin (req, res, next) {
 
 //END DUPLICATES
 
+function getWalletID(ownerID) {
+	return  walletStore.getWalletID(ownerID)
+}
+
+function getFunds(ownerID) {
+	return  walletStore.getUserBalance(ownerID)
+}
+
 router.get('/wallet', requireLogin, (req, res) => {
-	res.render('wallet')
+	let userID = req.session.user.id
+	let walletID = Promise.resolve(getWalletID(userID))
+	walletID.then(function(value){
+		walletID = value
+	})
+	let funds = Promise.resolve(getFunds(userID))
+	funds.then(function(value){
+		funds = value
+		console.log("userID: " + userID + " walletID: " + walletID + " funds: " + funds)
+		res.render('wallet', {userID, walletID, funds})
+	})
 })
 
 module.exports = router
