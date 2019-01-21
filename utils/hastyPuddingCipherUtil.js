@@ -370,3 +370,9 @@ function decryptHPCShort(ciphertext){
 function getKeyValues() {
 	return keyValues
 }
+
+module.exports = {
+		map: encryptHPCShort,
+		unmap: decryptHPCShort,
+		getKeyValues: getKeyValues
+}
