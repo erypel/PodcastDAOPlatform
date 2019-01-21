@@ -9,10 +9,10 @@
 		<h2>Podcasts</h2>
 		<table border="1">
 			<tr>
-				<th>Episode</th><th>Description</th>
+				<th>Episode</th><th>Description</th><th>Listen</th>
 			</tr>
-			<% podcasts.forEach(function(podcast) { %>
-				<tr><td><%=podcast.episode_name%></td><td><%=podcast.description%></td></tr>
+			<% podcasts.forEach(function(podcast) { console.log(podcast)%>
+				<tr><td><%=podcast.episode_name%></td><td><%=podcast.description%></td><td><a href="http://localhost:3000/play?path=<%=podcast.path%>"><button>Play</button></a></td></tr>
 			<% }) %>
 		</table>
 	</div>

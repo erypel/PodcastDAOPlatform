@@ -2,6 +2,7 @@
  * http://usejsdoc.org/
  */
 const fs = require('fs')
+const Feed = require('feed').Feed
 
 function appendToRSS(podcast){
 	let itemXML = '\t\t<item>\n\t\t\t<title>' + podcast.episode_name + '</title>\n\t\t\t<description>'+podcast.description+'</description>\n\t\t\t<link>/</link>\n\t\t</item>'
