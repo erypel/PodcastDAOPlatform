@@ -24,6 +24,18 @@ const NUM_WORDS = 256;
 const MOD = BigNumber('2', 2).pow(64) //applied to all addition, subtraction, multiplication
 const NUM_PASSES = 3; // number of passes for stirring function
 
+//Defaulting to all 0's
+const spice = [
+		BigNumber(0),
+		BigNumber(0),
+		BigNumber(0),
+		BigNumber(0),
+		BigNumber(0),
+		BigNumber(0),
+		BigNumber(0),
+		BigNumber(0)
+]
+
 /**
 	 * Key Expansion (KX) Tables
 	 *
@@ -154,4 +166,94 @@ function stir(KX) {
 			KX[i] = s2.add(s6).umod(MOD);
 		}
 	}
+}
+
+/**
+ * The encryption method for words of 36 - 64 bits. In this program, we plan on 
+ * only using this method for mapping XRP destination tags, so it will be used 
+ * for 10 digit Long values which should be 64 bits long.
+ * @param plaintextDestTag: a Long value we want encrypted
+ * @param KX: the key expansion table used for encryption
+ * @return an encrypted value
+ * @throws Exception 
+ */
+function encryptHPCShort(plaintext) {
+	let KX = createKeyExpansionTable(2, 10);
+	let blocksize = 64;
+	
+	/*
+	 * 	The plaintext is placed right-justified in variable s0.  LMASK is set
+	 *	to a block of 1s, to mask s0 to the valid bits between operations.
+	 */
+	let s0 = BigNumber(plaintext, 2)
+	let lmask = BigNumber('0xffffffffffffffff', 2);
+	
+	// A word from the KX array, KX[blocksize], is added to s0.
+	s0 = KX[blocksize].add(s0).umod(MOD);
+	s0.uand(lmask);
+	
+	// Several shift sizes are calculated:
+	let LBH = BigNumber((blocksize + 1) / 2); //division rounds down
+	let LBQ = (LBH.add(1)).div(2);
+	let LBT = (LBQ.add(blocksize)).div(4).add(2);
+	let GAP = 64 - blocksize;
+	
+	/*
+	 * Then 8 rounds of mixing are run with round index i going from 0...7
+	 * After the mixing, another word from KX, KX[blocksize + 8] is added to s0
+	 * s0 is masked, and the valid bits are written to the output array.
+	 * Any high-order bits in the output array are unchanged.
+	 */
+	for(let i = 0; i < 8; i++)
+	{
+		let k = KX[s0.uand(255)].add(spice[i]);
+		k.uand(lmask);
+		s0 = s0.add(k.ushln(8)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor((k.ushrn(GAP)).uand(~255));
+		s0 = s0.uand(lmask);
+		s0 = s0.add(s0.ushln(LBH + i)).umod(MOD);
+		s0 = s0.uand(lmask);
+		let t = spice[(i ^ 7)];
+		s0 = s0.uxor(t);
+		s0 = s0.sub(t.ushrn(GAP + i)).umod(MOD);
+		s0 = s0.add(t.ushrn(13)).umod(MOD);
+		s0 = s0.uxor(s0.ushrn(LBH));
+		s0 = s0.uand(lmask);
+		t = s0.uand(255);
+		k = KX[t];
+		k = k.uxor(spice[(i ^ 4)]);
+		k = k.uand(lmask);
+		k = KX[t+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
+		k = k.uand(lmask);
+		s0 = s0.uxor(k.ushln(8)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.sub(k.ushrn(GAP).uand(~255)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.sub(s0.ushln(LBH)).umod(MOD);
+		s0 = s0.uand(lmask);
+		t = spice[(i ^ 1)].uxor(PI19.add(blocksize).umod(MOD));
+		s0 = s0.add(t.ushln(3)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor(t.ushrn(GAP+2));
+		s0 = s0.uand(lmask);
+		s0 = s0.sub(t).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor(s0.ushrn(LBQ));
+		s0 = s0.uand(lmask);
+		let and = s0.uand(15);
+		s0 = s0.add(permb[and]).umod(MOD);
+		s0 = s0.uand(lmask);
+		t = spice[(i^2)];
+		s0 = s0.uxor(t.ushrn(GAP+4));
+		s0 = s0.uand(lmask);
+		s0 = s0.add(s0.ushln(LBT + s0.uand(15))).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.add(t).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor(s0.ushrn(LBH));
+		s0 = s0.uand(lmask);
+	}
+	
+	return s0;
 }
