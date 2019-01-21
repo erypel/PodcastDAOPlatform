@@ -88,6 +88,8 @@ router.get('/mapDestinationTag', requireLogin, (req, res) => {
 })
 
 router.get('/wallet', requireLogin, (req, res) => {
+	//TODO add dest tag stuff
+	let destinationTag = ''
 	let userID = req.session.user.id
 	let walletID = Promise.resolve(getWalletID(userID))
 	walletID.then(function(value){
@@ -97,7 +99,7 @@ router.get('/wallet', requireLogin, (req, res) => {
 	funds.then(function(value){
 		funds = value
 		console.log("userID: " + userID + " walletID: " + walletID + " funds: " + funds)
-		res.render('wallet', {userID, walletID, funds})
+		res.render('wallet', {userID, walletID, funds, destinationTag})
 	})
 })
 

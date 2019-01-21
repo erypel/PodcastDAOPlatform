@@ -15,13 +15,14 @@ const BigNumber = require('bn.js') //Javascript represents numbers using IEEE-75
 const keyValues = new Map()
 
 // A few internal "random" numbers used in the cipher:
-const PI19 = BigNumber('3141592653589793238', 2)
-const E19 = BigNumber('2718281828459045235', 2)
-const R220 = BigNumber('14142135623730950488', 2)
+const PI19 = new BigNumber('10101110011001001011011101111110100010001100100100100111010110', 2) //3141592653589793238
+const E19 = new BigNumber('10010110111001010001101110101111000000101100110110000101110011', 2) //2718281828459045235
+console.log(E19.toString(10))
+const R220 = new BigNumber('1100010001000010111101010110101111101001111000010111000101011000', 2) //14142135623730950488
 
 // a few helpful variables
 const NUM_WORDS = 256;
-const MOD = BigNumber('2', 2).pow(64) //applied to all addition, subtraction, multiplication
+const MOD = new BigNumber('10', 2).pow(new BigNumber('1000000', 2)) // 2^64, applied to all addition, subtraction, multiplication
 const NUM_PASSES = 3; // number of passes for stirring function
 
 /*
@@ -32,52 +33,52 @@ const NUM_PASSES = 3; // number of passes for stirring function
  *	low-order 4 bits, so they were swapped.
  */
 permb = [
-	BigNumber(0xB7E151628AED2A6A -0),
-	BigNumber(0xBF7158809CF4F3C7 -1),
-	BigNumber(0x62E7160F38B4DA56 -2),
-	BigNumber(0xA784D9045190CFEF -3),
-	BigNumber(0x324E7738926CFBE5 -4),
-	BigNumber(0xF4BF8D8D8C31D763 -5),
-	BigNumber(0xDA06C80ABB1185EB -6),
-	BigNumber(0x4F7C7B5757F59584 -7),
-	BigNumber(0x90CFD47D7C19BB42 -8),
-	BigNumber(0x158D9554F7B46BCE -9),
-	BigNumber(0x8A9A276BCFBFA1C8 -10),
-	BigNumber(0xE5AB6ADD835FD1A0 -11),
-	BigNumber(0x86D1BF275B9B241D -12),
-	BigNumber(0xF0D3D37BE67008E1 -13),
-	BigNumber(0x0FF8EC6D31BEB5CC -14),
-	BigNumber(0xEB64749A47DFDFB9 -15)
+	new BigNumber('0xB7E151628AED2A6A -0', 16),
+	new BigNumber('0xBF7158809CF4F3C7 -1', 16),
+	new BigNumber('0x62E7160F38B4DA56 -2', 16),
+	new BigNumber('0xA784D9045190CFEF -3', 16),
+	new BigNumber('0x324E7738926CFBE5 -4', 16),
+	new BigNumber('0xF4BF8D8D8C31D763 -5', 16),
+	new BigNumber('0xDA06C80ABB1185EB -6', 16),
+	new BigNumber('0x4F7C7B5757F59584 -7', 16),
+	new BigNumber('0x90CFD47D7C19BB42 -8', 16),
+	new BigNumber('0x158D9554F7B46BCE -9', 16),
+	new BigNumber('0x8A9A276BCFBFA1C8 -10', 16),
+	new BigNumber('0xE5AB6ADD835FD1A0 -11', 16),
+	new BigNumber('0x86D1BF275B9B241D -12', 16),
+	new BigNumber('0xF0D3D37BE67008E1 -13', 16),
+	new BigNumber('0x0FF8EC6D31BEB5CC -14', 16),
+	new BigNumber('0xEB64749A47DFDFB9 -15', 16)
 ]
 permbi = [
-		BigNumber(0xE5AB6ADD835FD1A0 -11),
-		BigNumber(0xF0D3D37BE67008E1 -13),
-		BigNumber(0x90CFD47D7C19BB42 -8),
-		BigNumber(0xF4BF8D8D8C31D763 -5),
-		BigNumber(0x4F7C7B5757F59584 -7),
-		BigNumber(0x324E7738926CFBE5 -4),
-		BigNumber(0x62E7160F38B4DA56 -2),
-		BigNumber(0xBF7158809CF4F3C7 -1),
-		BigNumber(0x8A9A276BCFBFA1C8 -10),
-		BigNumber(0xEB64749A47DFDFB9 -15),
-		BigNumber(0xB7E151628AED2A6A -0),
-		BigNumber(0xDA06C80ABB1185EB -6),
-		BigNumber(0x0FF8EC6D31BEB5CC -14),
-		BigNumber(0x86D1BF275B9B241D -12),
-		BigNumber(0x158D9554F7B46BCE -9),
-		BigNumber(0xA784D9045190CFEF -3)
+		new BigNumber('0xE5AB6ADD835FD1A0 -11', 16),
+		new BigNumber('0xF0D3D37BE67008E1 -13', 16),
+		new BigNumber('0x90CFD47D7C19BB42 -8', 16),
+		new BigNumber('0xF4BF8D8D8C31D763 -5', 16),
+		new BigNumber('0x4F7C7B5757F59584 -7', 16),
+		new BigNumber('0x324E7738926CFBE5 -4', 16),
+		new BigNumber('0x62E7160F38B4DA56 -2', 16),
+		new BigNumber('0xBF7158809CF4F3C7 -1', 16),
+		new BigNumber('0x8A9A276BCFBFA1C8 -10', 16),
+		new BigNumber('0xEB64749A47DFDFB9 -15', 16),
+		new BigNumber('0xB7E151628AED2A6A -0', 16),
+		new BigNumber('0xDA06C80ABB1185EB -6', 16),
+		new BigNumber('0x0FF8EC6D31BEB5CC -14', 16),
+		new BigNumber('0x86D1BF275B9B241D -12', 16),
+		new BigNumber('0x158D9554F7B46BCE -9', 16),
+		new BigNumber('0xA784D9045190CFEF -3', 16)
 	]
 
 //Defaulting to all 0's
 const spice = [
-		BigNumber(0),
-		BigNumber(0),
-		BigNumber(0),
-		BigNumber(0),
-		BigNumber(0),
-		BigNumber(0),
-		BigNumber(0),
-		BigNumber(0)
+		new BigNumber(0),
+		new BigNumber(0),
+		new BigNumber(0),
+		new BigNumber(0),
+		new BigNumber(0),
+		new BigNumber(0),
+		new BigNumber(0),
+		new BigNumber(0)
 ]
 
 /**
@@ -229,15 +230,15 @@ function encryptHPCShort(plaintext) {
 	 * 	The plaintext is placed right-justified in variable s0.  LMASK is set
 	 *	to a block of 1s, to mask s0 to the valid bits between operations.
 	 */
-	let s0 = BigNumber(plaintext, 2)
-	let lmask = BigNumber('0xffffffffffffffff', 2);
+	let s0 = new BigNumber(plaintext, 2)
+	let lmask = new BigNumber('0xffffffffffffffff', 2);
 	
 	// A word from the KX array, KX[blocksize], is added to s0.
 	s0 = KX[blocksize].add(s0).umod(MOD);
 	s0.uand(lmask);
 	
 	// Several shift sizes are calculated:
-	let LBH = BigNumber((blocksize + 1) / 2); //division rounds down
+	let LBH = new BigNumber((blocksize + 1) / 2); //division rounds down
 	let LBQ = (LBH.add(1)).div(2);
 	let LBT = (LBQ.add(blocksize)).div(4).add(2);
 	let GAP = 64 - blocksize;
@@ -315,7 +316,7 @@ function decryptHPCShort(ciphertext){
 	let KX = createKeyExpansionTable(2, 10);
 	
 	// Several shift sizes are calculated:
-	let LBH = BigNumber((blocksize + 1) / 2); //division rounds down
+	let LBH = new BigNumber((blocksize + 1) / 2); //division rounds down
 	let LBQ = (LBH.add(1)).div(2);
 	let LBT = (LBQ.add(blocksize)).div(4).add(2);
 	let GAP = 64 - blocksize;
