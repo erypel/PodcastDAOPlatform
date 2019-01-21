@@ -22,7 +22,8 @@ const R220 = BigNumber('14142135623730950488', 2)
 // a few helpful variables
 const NUM_WORDS = 256;
 const MOD = BigNumber('2', 2).pow(64) //applied to all addition, subtraction, multiplication
- 
+const NUM_PASSES = 3; // number of passes for stirring function
+
 /**
 	 * Key Expansion (KX) Tables
 	 *
@@ -82,7 +83,7 @@ function createKeyExpansionTable(subCipherNumber, keyLength) {
 	 */
 	
 	// pseudo randomize the KX array
-	stir(KX);
+	stir(KX)
 	
 	/*
 	 * finish up key expansion by copying the first 30 words of the array onto
@@ -91,12 +92,66 @@ function createKeyExpansionTable(subCipherNumber, keyLength) {
 	 */
 	for(let i = 0; i < 30; i++)
 	{
-		KX[256 + i] = KX[i];
+		KX[256 + i] = KX[i]
 	}
 	
-	return KX;
+	return KX
 }
 
+/**
+ * The purpose of the Stirring function is to pseudo-randomize the KX array,
+ * allowing each bit to influence every other bit.
+ * 
+ * The function does several passes of the KX array, altering every word. The
+ * default number of passes is 3. 
+ * 
+ * Yet to be implemented is the backup feature causing additional passes.
+ * The number of extra passes is the sum of the global backup variable BACKUP
+ * and the array entry BACKUPSUBCIPHER[0]. Normally both values are 0. As of 
+ * right now, it is not necessary to implement this.
+ */
 function stir(KX) {
+	/*
+	 * The stirring function has 8 internal state variables, each an unsigned 64 bit
+	 * word. Before the first pass of the KX array, they are initialized from
+	 * the last 8 values in the array.
+	 */
+	let s0 = KX[248], s1 = KX[249], s2 = KX[250], s3 = KX[251], s4 = KX[252], s5 = KX[253], s6 = KX[254],
+			s7 = KX[255];
 	
+	for(let j = 0; j < NUM_PASSES; j++)
+	{
+		/*
+		 * One pass of the KX array: Each word in the KX array is mixed with the state
+		 * variables, starting with KX[0] and working through KX[255]. Each array word
+		 * is overwritten after mixing. The missing function is deliberately made
+		 * slightly lossy so that the process cannot be run backward to discover the
+		 * pre-stirred KX value, and hence the key.
+		 */
+		for(let i = 0; i < NUM_WORDS; i++)
+		{
+			// Perform the individual word stirring algorithm
+			// BigInteger is immutable so need to reassign values like this:
+			s0 = s0.uxor((KX[i].uxor(KX[(i + 83).uand(255)]).add(KX[s0.uand(255)]).umod(MOD))); // sometimes lossy
+			s2 = s2.add(KX[i]).umod(MOD); // necessary to prevent Wagner equivalent key problem
+			s1 = s1.add(s0).umod(MOD);
+			s3 = s3.uxor(s2);
+			s5 = s5.sub(s4).umod(MOD);
+			s7 = s7.uxor(s6);
+			s3 = s3.add(s0.ushrn(13)).umod(MOD);
+			s4 = s4.uxor(s1.ushln(11));
+			s5 = s5.uxor(s3.ushln(s1.uand(31)));
+			s6 = s6.add(s2.ushrn(17)).umod(MOD);
+			s7 = s7.uor(s3.add(s4).umod(MOD)); // lossy
+			s2 = s2.sub(s5).umod(MOD); // cross-link
+			s0 = s0.sub(s6.uxor(i)).umod(MOD);
+			s1 = s1.uxor(s5.add(PI19).umod(MOD));
+			s2 = s2.add(s7.ushrn(j)).umod(MOD);
+			s2 = s2.uxor(s1);
+			s4 = s4.sub(s3).umod(MOD);
+			s6 = s6.uxor(s5);
+			s0 = s0.add(s7).umod(MOD);
+			KX[i] = s2.add(s6).umod(MOD);
+		}
+	}
 }
