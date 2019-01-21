@@ -24,6 +24,50 @@ const NUM_WORDS = 256;
 const MOD = BigNumber('2', 2).pow(64) //applied to all addition, subtraction, multiplication
 const NUM_PASSES = 3; // number of passes for stirring function
 
+/*
+ * 	Permb was derived from the hex expansion of e (2.718...).  The
+ *	fraction was grouped into chunks of 64 bits, and the first sixteen
+ *	chunks with unique low-order 4bit hex digits were selected.  The
+ *	twelfth and fourteenth entries would have been fixed points for the
+ *	low-order 4 bits, so they were swapped.
+ */
+permb = [
+	BigNumber(0xB7E151628AED2A6A -0),
+	BigNumber(0xBF7158809CF4F3C7 -1),
+	BigNumber(0x62E7160F38B4DA56 -2),
+	BigNumber(0xA784D9045190CFEF -3),
+	BigNumber(0x324E7738926CFBE5 -4),
+	BigNumber(0xF4BF8D8D8C31D763 -5),
+	BigNumber(0xDA06C80ABB1185EB -6),
+	BigNumber(0x4F7C7B5757F59584 -7),
+	BigNumber(0x90CFD47D7C19BB42 -8),
+	BigNumber(0x158D9554F7B46BCE -9),
+	BigNumber(0x8A9A276BCFBFA1C8 -10),
+	BigNumber(0xE5AB6ADD835FD1A0 -11),
+	BigNumber(0x86D1BF275B9B241D -12),
+	BigNumber(0xF0D3D37BE67008E1 -13),
+	BigNumber(0x0FF8EC6D31BEB5CC -14),
+	BigNumber(0xEB64749A47DFDFB9 -15)
+]
+permbi = [
+		BigNumber(0xE5AB6ADD835FD1A0 -11),
+		BigNumber(0xF0D3D37BE67008E1 -13),
+		BigNumber(0x90CFD47D7C19BB42 -8),
+		BigNumber(0xF4BF8D8D8C31D763 -5),
+		BigNumber(0x4F7C7B5757F59584 -7),
+		BigNumber(0x324E7738926CFBE5 -4),
+		BigNumber(0x62E7160F38B4DA56 -2),
+		BigNumber(0xBF7158809CF4F3C7 -1),
+		BigNumber(0x8A9A276BCFBFA1C8 -10),
+		BigNumber(0xEB64749A47DFDFB9 -15),
+		BigNumber(0xB7E151628AED2A6A -0),
+		BigNumber(0xDA06C80ABB1185EB -6),
+		BigNumber(0x0FF8EC6D31BEB5CC -14),
+		BigNumber(0x86D1BF275B9B241D -12),
+		BigNumber(0x158D9554F7B46BCE -9),
+		BigNumber(0xA784D9045190CFEF -3)
+	]
+
 //Defaulting to all 0's
 const spice = [
 		BigNumber(0),
@@ -321,4 +365,8 @@ function decryptHPCShort(ciphertext){
 	s0 = s0.sub(KX[blocksize]).umod(MOD);
 	
 	return s0;
+}
+
+function getKeyValues() {
+	return keyValues
 }
