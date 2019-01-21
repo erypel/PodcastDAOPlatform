@@ -31,7 +31,6 @@ module.exports = {
 	      })
 	},
 	getFeedID(ownerID) {
-		let rssFeedID
 		return knex.select('id').table('rssfeed').where('owner_id', ownerID).then(function(rowDataPacket){
 				return rowDataPacket[0].id
 			})

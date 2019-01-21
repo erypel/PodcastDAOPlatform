@@ -15,7 +15,7 @@ module.exports = {
 				 email,
 				 salt,
 				 encrypted_password: hash
-			 })
+			 }, 'id') //returns id in order to generate wallet
 		},
 		authenticate ({ username, password }) {
 		    console.log(`Authenticating user ${username}`)
