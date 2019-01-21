@@ -4,6 +4,7 @@
 const express = require('express')
 const router = express.Router()
 const userStore = require('./store')
+const walletStore = require('../wallet/walletStore')
 const session = require('client-sessions')
 const bodyParser = require('body-parser')
 
@@ -81,13 +82,14 @@ router.get('/createUser', function(req, res) {
 })
 
 router.post('/createUser', (req, res) => {
-	console.log("here")
-	console.log(req)
 	userStore.createUser({
 		username: req.body.username,
 		email: req.body.email,
 		password: req.body.password
-	}).then(() => res.sendStatus(200))
+	}).then((result) => {
+		walletStore.createWallet(result)
+		res.sendStatus(200)
+		})
 })
 
 router.post('/login', (req, res) => {
