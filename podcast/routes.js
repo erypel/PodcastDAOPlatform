@@ -72,10 +72,6 @@ router.get('/podcast', requireLogin, (req, res) => {
 	})
 })
 
-router.get('/listen', requireLogin, (req, res) => {
-	res.render('listen')
-})
-
 // define a route music it creates readstream to the requested 
 // file and pipes the output to response
 router.get('/play', function(req, res) {
