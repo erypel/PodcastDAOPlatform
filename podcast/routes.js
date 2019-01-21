@@ -95,6 +95,7 @@ router.get('/play', function(req, res) {
 	})
 })
 
+//TODO yet to be implemented, but a good start for later
 router.get('/download', (req, res) => {
 	let fileId = req.query.id
 	let file = '../uploads/' + fileId
