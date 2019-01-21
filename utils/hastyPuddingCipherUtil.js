@@ -257,3 +257,68 @@ function encryptHPCShort(plaintext) {
 	
 	return s0;
 }
+
+/**
+ * The decryption method for words of 36 - 64 bits. In this program, we plan on 
+ * only using this method for mapping XRP destination tags, so it will be used 
+ * for 10 digit Long values which should be 64 bits long.
+ * @param ciphertext: a value we want decrypted
+ * @return a decrypted value
+ */
+function decryptHPCShort(ciphertext){
+	let s0 = ciphertext;
+	
+	let KX = createKeyExpansionTable(2, 10);
+	
+	// Several shift sizes are calculated:
+	let LBH = BigNumber((blocksize + 1) / 2); //division rounds down
+	let LBQ = (LBH.add(1)).div(2);
+	let LBT = (LBQ.add(blocksize)).div(4).add(2);
+	let GAP = 64 - blocksize;
+	
+	for(let i = 7; i >= 0; i--)
+	{
+		s0 = s0.uxor(s0.ushrn(LBH));
+		let t = spice[(i^2)];
+		s0 = s0.sub(t).umod(MOD);
+		
+		// Inverse of s0 = s0.add(s0.shiftLeft(LBT.intValue() + s0.and(BigInteger.valueOf(15)).intValue())).mod(MOD);
+		t = LBT.add(s0.uand(15));
+		s0 = s0.sub(s0.sub(s0.ushln(t)).ushln(t)).umod(MOD);
+		
+		t = spice[(i^2)];
+		s0 = s0.uxor(t.ushrn(GAP+4));
+		
+		let and = s0.uand(15);
+		s0 = s0.sub(permbi[and]).umod(MOD);
+		
+		//Inverse of s0 = s0.xor(s0.shiftRight(LBQ.intValue())); is this:
+		s0 = s0.uxor(s0.ushrn(LBQ));
+		s0 = s0.uxor(s0.ushrn(LBQ.mul(2)));
+		
+		t = spice[(i ^ 1)].uxor(PI19.add(blocksize).umod(MOD));
+		s0 = s0.add(t).umod(MOD);
+		s0 = s0.uxor(t.ushrn(GAP+2));
+		s0 = s0.sub(t.ushln(3)).umod(MOD);
+		s0 = s0.add(s0.ushln(LBH)).umod(MOD);
+		t = s0.uand(255);
+		let k = KX[t];
+		k = k.uxor(spice[(i ^ 4)]);
+		k = KX[t+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
+		s0 = s0.add(k.ushrn(GAP).uand(~255)).umod(MOD);
+		s0 = s0.uxor(k.ushln(8)).umod(MOD);
+		t = spice[(i ^ 7)];
+		s0 = s0.uxor(s0.ushrn(LBH));;
+		s0 = s0.sub(t.ushrn(13));
+		s0 = s0.add(t.ushrn(GAP+i));
+		s0 = s0.uxor(t);
+		s0 = s0.sub(s0.ushln(LBH + i)).umod(MOD);
+		k = KX[s0.uand(255)].add(spice[i]);
+		s0 = s0.uxor((k.ushrn(GAP)).uand(~255));
+		s0 = s0.sub(k.ushln(8)).umod(MOD);
+	}
+	
+	s0 = s0.sub(KX[blocksize]).umod(MOD);
+	
+	return s0;
+}
