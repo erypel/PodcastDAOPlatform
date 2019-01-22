@@ -6,6 +6,7 @@ const router = express.Router()
 const bodyParser = require('body-parser')
 const walletStore = require('./walletStore')
 const walletMapper = require('../utils/hastyPuddingCipherUtil')
+const BigNumber = require('bn.js')
 
 router.use(bodyParser.json())
 
@@ -68,16 +69,21 @@ function getFunds(ownerID) {
 router.get('/mapDestinationTag', requireLogin, (req, res) => {
 	// use userID to map to destination tag
 	let userID = req.session.user.id
-	let destinationTag = Promise.resolve(walletMapper.map(userID))
+	let destinationTag = Promise.resolve(walletMapper.map(123456789000))
 	destinationTag.then(function(value){
+		console.log("value1: " + value)
 		destinationTag = value
+		console.log("destination1: " + destinationTag)
+		//for testing
+		let unmap = Promise.resolve(walletMapper.unmap(destinationTag))
+		unmap.then(function(value){
+			console.log("value2: " + value)
+			destinationTag = value
+			console.log("destination2: " + destinationTag)
+		})
 	})
 	
-	//for testing
-	destinationTag = Promise.resolve(walletMapper.unmap(userID))
-	destinationTag.then(function(value){
-		destinationTag = value
-	})
+	
 	
 	// duplicate code of get /wallet
 	//TODO consolidate 
