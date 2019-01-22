@@ -17,7 +17,6 @@ const keyValues = new Map()
 // A few internal "random" numbers used in the cipher:
 const PI19 = new BigNumber('10101110011001001011011101111110100010001100100100100111010110', 2) //3141592653589793238
 const E19 = new BigNumber('10010110111001010001101110101111000000101100110110000101110011', 2) //2718281828459045235
-console.log(E19.toString(10))
 const R220 = new BigNumber('1100010001000010111101010110101111101001111000010111000101011000', 2) //14142135623730950488
 
 // a few helpful variables
@@ -310,55 +309,55 @@ function encryptHPCShort(plaintext) {
  * @return a decrypted value
  */
 function decryptHPCShort(ciphertext){
-	let s0 = ciphertext;
-	
+	let s0 = new BigNumber(ciphertext.toString(2), 2);
+	let blocksize = 64;
 	let KX = createKeyExpansionTable(2, 10);
 	
 	// Several shift sizes are calculated:
 	let LBH = new BigNumber((blocksize + 1) / 2); //division rounds down
-	let LBQ = (LBH.add(1)).div(2);
-	let LBT = (LBQ.add(blocksize)).div(4).add(2);
+	let LBQ = (LBH.add(new BigNumber('1', 2))).div(new BigNumber('10', 2));
+	let LBT = (LBQ.add(new BigNumber(blocksize.toString(2), 2))).div(new BigNumber('100', 2)).add(new BigNumber('10', 2));
 	let GAP = 64 - blocksize;
 	
 	for(let i = 7; i >= 0; i--)
 	{
-		s0 = s0.uxor(s0.ushrn(LBH));
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
 		let t = spice[(i^2)];
 		s0 = s0.sub(t).umod(MOD);
 		
 		// Inverse of s0 = s0.add(s0.shiftLeft(LBT.intValue() + s0.and(BigInteger.valueOf(15)).intValue())).mod(MOD);
-		t = LBT.add(s0.uand(15));
-		s0 = s0.sub(s0.sub(s0.ushln(t)).ushln(t)).umod(MOD);
+		t = LBT.add(s0.uand(new BigNumber('1111', 2)));
+		s0 = s0.sub(s0.sub(s0.ushln(t.toNumber())).ushln(t.toNumber())).umod(MOD);
 		
 		t = spice[(i^2)];
 		s0 = s0.uxor(t.ushrn(GAP+4));
 		
-		let and = s0.uand(15);
+		let and = s0.uand(new BigNumber('1111', 2));
 		s0 = s0.sub(permbi[and]).umod(MOD);
 		
 		//Inverse of s0 = s0.xor(s0.shiftRight(LBQ.intValue())); is this:
-		s0 = s0.uxor(s0.ushrn(LBQ));
-		s0 = s0.uxor(s0.ushrn(LBQ.mul(2)));
+		s0 = s0.uxor(s0.ushrn(LBQ.toNumber()));
+		s0 = s0.uxor(s0.ushrn(LBQ.mul(new BigNumber('10', 2)).toNumber()));
 		
-		t = spice[(i ^ 1)].uxor(PI19.add(blocksize).umod(MOD));
+		t = spice[(i ^ 1)].uxor(PI19.add(new BigNumber(blocksize.toString(2), 2)).umod(MOD));
 		s0 = s0.add(t).umod(MOD);
 		s0 = s0.uxor(t.ushrn(GAP+2));
 		s0 = s0.sub(t.ushln(3)).umod(MOD);
-		s0 = s0.add(s0.ushln(LBH)).umod(MOD);
-		t = s0.uand(255);
+		s0 = s0.add(s0.ushln(LBH.toNumber())).umod(MOD);
+		t = s0.uand(new BigNumber('11111111', 2));
 		let k = KX[t];
 		k = k.uxor(spice[(i ^ 4)]);
-		k = KX[t+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
-		s0 = s0.add(k.ushrn(GAP).uand(~255)).umod(MOD);
+		k = KX[t.toNumber()+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
+		s0 = s0.add(k.ushrn(GAP).uand(new BigNumber('00000000', 2))).umod(MOD);
 		s0 = s0.uxor(k.ushln(8)).umod(MOD);
 		t = spice[(i ^ 7)];
-		s0 = s0.uxor(s0.ushrn(LBH));;
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));;
 		s0 = s0.sub(t.ushrn(13));
 		s0 = s0.add(t.ushrn(GAP+i));
 		s0 = s0.uxor(t);
-		s0 = s0.sub(s0.ushln(LBH + i)).umod(MOD);
-		k = KX[s0.uand(255)].add(spice[i]);
-		s0 = s0.uxor((k.ushrn(GAP)).uand(~255));
+		s0 = s0.sub(s0.ushln(LBH.toNumber() + i)).umod(MOD);
+		k = KX[s0.uand(new BigNumber('11111111', 2))].add(spice[i]);
+		s0 = s0.uxor((k.ushrn(GAP)).uand(new BigNumber('00000000', 2)));
 		s0 = s0.sub(k.ushln(8)).umod(MOD);
 	}
 	
