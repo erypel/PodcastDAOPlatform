@@ -69,12 +69,10 @@ function getFunds(ownerID) {
 router.get('/mapDestinationTag', requireLogin, (req, res) => {
 	// use userID to map to destination tag
 	let userID = req.session.user.id
-	let destinationTag = Promise.resolve(walletMapper.map(123456789000))
+	let destinationTag = Promise.resolve(walletMapper.map(userID))
 	destinationTag.then(function(value){
 		destinationTag = value
 	})
-	
-	
 	
 	// duplicate code of get /wallet
 	//TODO consolidate 
