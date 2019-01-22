@@ -7,8 +7,11 @@
 <body>
 	<div id="balance">	
 		<h1>UID: <%=userID%> / WID: <%=walletID%>  / <%=funds%> XRP</h1>			
-		<!--<h1>${destTag}</h1>-->
+		<h2>Destination Tag: <%=destinationTag%></h2>
 	</div>
+	<form action="/mapDestinationTag" method = "get">
+          <button>Generate Destination Tag</button>
+    </form> 
 	<form action="/dashboard" method = "get">
           <button>Back</button>
     </form> 
