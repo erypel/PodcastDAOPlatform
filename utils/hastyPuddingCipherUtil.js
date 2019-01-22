@@ -115,8 +115,8 @@ function createKeyExpansionTable(subCipherNumber, keyLength) {
 	let subcipherBits = [35, 64, 128, 512, 1024]
 	
 	// The first 3 words of the KX array are intialized:
-	KX[0] = PI19.add(subCipherNumber)
-	KX[1] = E19.mul(keyLength)
+	KX[0] = PI19.add(new BigNumber(subCipherNumber.toString(2), 2))
+	KX[1] = E19.mul(new BigNumber(keyLength.toString(2), 2))
 	KX[2] = R220.ushln(subcipherBits[subCipherNumber - 1])
 	
 	/*
@@ -188,8 +188,7 @@ function stir(KX) {
 		for(let i = 0; i < NUM_WORDS; i++)
 		{
 			// Perform the individual word stirring algorithm
-			// BigInteger is immutable so need to reassign values like this:
-			s0 = s0.uxor((KX[i].uxor(KX[(i + 83).uand(255)]).add(KX[s0.uand(255)]).umod(MOD))); // sometimes lossy
+			s0 = s0.uxor((KX[i].uxor(KX[(i + 83) & (255)]).add(KX[s0.uand(new BigNumber('11111111', 2))]).umod(MOD))); // sometimes lossy
 			s2 = s2.add(KX[i]).umod(MOD); // necessary to prevent Wagner equivalent key problem
 			s1 = s1.add(s0).umod(MOD);
 			s3 = s3.uxor(s2);
@@ -197,11 +196,11 @@ function stir(KX) {
 			s7 = s7.uxor(s6);
 			s3 = s3.add(s0.ushrn(13)).umod(MOD);
 			s4 = s4.uxor(s1.ushln(11));
-			s5 = s5.uxor(s3.ushln(s1.uand(31)));
+			s5 = s5.uxor(s3.ushln(s1.uand(new BigNumber('11111', 2)).toNumber()));
 			s6 = s6.add(s2.ushrn(17)).umod(MOD);
 			s7 = s7.uor(s3.add(s4).umod(MOD)); // lossy
 			s2 = s2.sub(s5).umod(MOD); // cross-link
-			s0 = s0.sub(s6.uxor(i)).umod(MOD);
+			s0 = s0.sub(s6.uxor(new BigNumber(i.toString(2), 2))).umod(MOD);
 			s1 = s1.uxor(s5.add(PI19).umod(MOD));
 			s2 = s2.add(s7.ushrn(j)).umod(MOD);
 			s2 = s2.uxor(s1);
@@ -239,8 +238,8 @@ function encryptHPCShort(plaintext) {
 	
 	// Several shift sizes are calculated:
 	let LBH = new BigNumber((blocksize + 1) / 2); //division rounds down
-	let LBQ = (LBH.add(1)).div(2);
-	let LBT = (LBQ.add(blocksize)).div(4).add(2);
+	let LBQ = (LBH.add(new BigNumber('1', 2))).div(new BigNumber('10', 2));
+	let LBT = (LBQ.add(new BigNumber(blocksize.toString(2), 2))).div(new BigNumber('100', 2)).add(new BigNumber('10', 2));
 	let GAP = 64 - blocksize;
 	
 	/*
@@ -251,52 +250,52 @@ function encryptHPCShort(plaintext) {
 	 */
 	for(let i = 0; i < 8; i++)
 	{
-		let k = KX[s0.uand(255)].add(spice[i]);
+		let k = KX[s0.uand(new BigNumber('11111111', 2))].add(spice[i]);
 		k.uand(lmask);
 		s0 = s0.add(k.ushln(8)).umod(MOD);
 		s0 = s0.uand(lmask);
-		s0 = s0.uxor((k.ushrn(GAP)).uand(~255));
+		s0 = s0.uxor((k.ushrn(GAP)).uand(new BigNumber('00000000', 2)));
 		s0 = s0.uand(lmask);
-		s0 = s0.add(s0.ushln(LBH + i)).umod(MOD);
+		s0 = s0.add(s0.ushln(LBH.toNumber() + i)).umod(MOD);
 		s0 = s0.uand(lmask);
 		let t = spice[(i ^ 7)];
 		s0 = s0.uxor(t);
 		s0 = s0.sub(t.ushrn(GAP + i)).umod(MOD);
 		s0 = s0.add(t.ushrn(13)).umod(MOD);
-		s0 = s0.uxor(s0.ushrn(LBH));
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
 		s0 = s0.uand(lmask);
-		t = s0.uand(255);
+		t = s0.uand(new BigNumber('11111111', 2));
 		k = KX[t];
 		k = k.uxor(spice[(i ^ 4)]);
 		k = k.uand(lmask);
-		k = KX[t+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
+		k = KX[t.toNumber()+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
 		k = k.uand(lmask);
 		s0 = s0.uxor(k.ushln(8)).umod(MOD);
 		s0 = s0.uand(lmask);
-		s0 = s0.sub(k.ushrn(GAP).uand(~255)).umod(MOD);
+		s0 = s0.sub(k.ushrn(GAP).uand(new BigNumber('00000000', 2))).umod(MOD);
 		s0 = s0.uand(lmask);
-		s0 = s0.sub(s0.ushln(LBH)).umod(MOD);
+		s0 = s0.sub(s0.ushln(LBH.toNumber())).umod(MOD);
 		s0 = s0.uand(lmask);
-		t = spice[(i ^ 1)].uxor(PI19.add(blocksize).umod(MOD));
+		t = spice[(i ^ 1)].uxor(PI19.add(new BigNumber(blocksize.toString(2), 2)).umod(MOD));
 		s0 = s0.add(t.ushln(3)).umod(MOD);
 		s0 = s0.uand(lmask);
 		s0 = s0.uxor(t.ushrn(GAP+2));
 		s0 = s0.uand(lmask);
 		s0 = s0.sub(t).umod(MOD);
 		s0 = s0.uand(lmask);
-		s0 = s0.uxor(s0.ushrn(LBQ));
+		s0 = s0.uxor(s0.ushrn(LBQ.toNumber()));
 		s0 = s0.uand(lmask);
-		let and = s0.uand(15);
+		let and = s0.uand(new BigNumber('1111', 2));
 		s0 = s0.add(permb[and]).umod(MOD);
 		s0 = s0.uand(lmask);
 		t = spice[(i^2)];
 		s0 = s0.uxor(t.ushrn(GAP+4));
 		s0 = s0.uand(lmask);
-		s0 = s0.add(s0.ushln(LBT + s0.uand(15))).umod(MOD);
+		s0 = s0.add(s0.ushln(LBT.add(s0.uand(new BigNumber('1111', 2))).toNumber())).umod(MOD);
 		s0 = s0.uand(lmask);
 		s0 = s0.add(t).umod(MOD);
 		s0 = s0.uand(lmask);
-		s0 = s0.uxor(s0.ushrn(LBH));
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
 		s0 = s0.uand(lmask);
 	}
 	
