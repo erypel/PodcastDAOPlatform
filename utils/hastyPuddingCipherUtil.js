@@ -116,8 +116,7 @@ function createKeyExpansionTable(subCipherNumber, keyLength) {
 	// The first 3 words of the KX array are intialized:
 	KX[0] = PI19.add(new BigNumber(subCipherNumber.toString(2), 2)).umod(MOD)
 	KX[1] = E19.mul(new BigNumber(keyLength.toString(2), 2)).umod(MOD)
-	//KX[2] = R220.shln(subcipherBits[subCipherNumber - 1]).mod(MOD)
-	KX[2] = R220.ushln(subCipherNumber).mod(MOD)
+	KX[2] = R220.shln(subcipherBits[subCipherNumber - 1]).mod(MOD)
 	/*
 	 * The remaining 253 words of the array are pseudo-randomly filled in with the
 	 * equation
@@ -220,32 +219,25 @@ function stir(KX) {
  * @return an encrypted value
  * @throws Exception 
  */
-async function encryptHPCShort(plaintext) {
-	let KX = await createKeyExpansionTable(2, 10);
+function encryptHPCShort(plaintext) {
+	let KX = createKeyExpansionTable(2, 10);
 	let blocksize = 64;
 	
 	/*
 	 * 	The plaintext is placed right-justified in variable s0.  LMASK is set
 	 *	to a block of 1s, to mask s0 to the valid bits between operations.
 	 */
-	let s0 = await new BigNumber(plaintext.toString(2), 2)
-	console.log("orig: " + s0)
-	let lmask = await new BigNumber('0xffffffffffffffff', 16);
+	let s0 = new BigNumber(plaintext.toString(2), 2)
+	let lmask = new BigNumber('0xffffffffffffffff', 16);
 	
 	// A word from the KX array, KX[blocksize], is added to s0.
-	s0 = await KX[blocksize].add(s0).umod(MOD);
-	console.log("added: " + s0)
+	s0 = KX[blocksize].add(s0).umod(MOD);
 	s0.uand(lmask);
-	console.log("masked: " + s0)
 	// Several shift sizes are calculated:
-	let LBH = await new BigNumber((blocksize + 1) / 2); //division rounds down
-	let LBQ = await (LBH.add(new BigNumber('1', 2))).div(new BigNumber('10', 2));
-	let LBT = await (LBQ.add(new BigNumber(Number(blocksize).toString(2), 2))).div(new BigNumber('100', 2)).add(new BigNumber('10', 2));
-	let GAP = await 64 - blocksize;
-	console.log("LBH: " + LBH.toString(10))
-	console.log("LBQ: " + LBQ.toString(10))
-	console.log("LBT: " + LBT.toString(10))
-	console.log("GAP: " + GAP)
+	let LBH = new BigNumber((blocksize + 1) / 2); //division rounds down
+	let LBQ = (LBH.add(new BigNumber('1', 2))).div(new BigNumber('10', 2));
+	let LBT = (LBQ.add(new BigNumber(Number(blocksize).toString(2), 2))).div(new BigNumber('100', 2)).add(new BigNumber('10', 2));
+	let GAP = 64 - blocksize;
 	
 	/*
 	 * Then 8 rounds of mixing are run with round index i going from 0...7
@@ -255,89 +247,54 @@ async function encryptHPCShort(plaintext) {
 	 */
 	for(let i = 0; i < 8; i++)
 	{
-		let k = await KX[s0.uand(new BigNumber('11111111', 2))].add(spice[i]);
+		let k = KX[s0.uand(new BigNumber('11111111', 2))].add(spice[i]);
 		k.uand(lmask);
-		 console.log("k: " + k.toString(10))
-		s0 = await s0.add(k.ushln(8)).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.uxor((k.ushrn(GAP)).uand(new BigNumber('00000000', 2)));
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.add(s0.ushln(LBH.toNumber() + i)).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		let t = await spice[(i ^ 7)];
-		 console.log("t: " + t.toString(10))
-		s0 = await s0.uxor(t);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.sub(t.ushrn(GAP + i)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.add(t.ushrn(13)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.uxor(s0.ushrn(LBH.toNumber()));
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		t = await s0.uand(new BigNumber('11111111', 2));
-		 console.log("t: " + t.toString(10))
-		k = await KX[t];
-		 console.log("k: " + k.toString(10))
-		k = await k.uxor(spice[(i ^ 4)]);
-		k = await k.uand(lmask);
-		 console.log("k: " + k.toString(10))
-		k = await KX[t.toNumber()+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
-		k = await k.uand(lmask);
-		 console.log("k: " + k.toString(10))
-		s0 = await s0.uxor(k.ushln(8)).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.sub(k.ushrn(GAP).uand(new BigNumber('00000000', 2))).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.sub(s0.ushln(LBH.toNumber())).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		t = await spice[(i ^ 1)].uxor(PI19.add(new BigNumber(blocksize.toString(2), 2)).umod(MOD));
-		 console.log("t: " + t.toString(10))
-		s0 = await s0.add(t.ushln(3)).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.uxor(t.ushrn(GAP+2));
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.sub(t).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.uxor(s0.ushrn(LBQ.toNumber()));
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		
-		 console.log("and with s0: " + s0.toString(10))
-		let and = await s0.uand(new BigNumber('1111', 2));
-		
-		
-		 console.log("and: " + and.toString(10))
-		s0 = await s0.add(permb[and]).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("permb s0: " + s0.toString(10))
-		t = await spice[(i^2)];
-		 console.log("t: " + t.toString(10))
-		s0 = await s0.uxor(t.ushrn(GAP+4));
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		
-		s0 = await s0.add(s0.ushln(LBT.add(s0.uand(new BigNumber('1111', 2))).toNumber())).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		
-		s0 = await s0.add(t).umod(MOD);
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.uxor(s0.ushrn(LBH.toNumber()));
-		s0 = await s0.uand(lmask);
-		 console.log("s0: " + s0.toString(10))
+		s0 = s0.add(k.ushln(8)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor((k.ushrn(GAP)).uand(new BigNumber('00000000', 2)));
+		s0 = s0.uand(lmask);
+		s0 = s0.add(s0.ushln(LBH.toNumber() + i)).umod(MOD);
+		s0 = s0.uand(lmask);
+		let t = spice[(i ^ 7)];
+		s0 = s0.uxor(t);
+		s0 = s0.sub(t.ushrn(GAP + i)).umod(MOD);
+		s0 = s0.add(t.ushrn(13)).umod(MOD);
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
+		s0 = s0.uand(lmask);
+		t = s0.uand(new BigNumber('11111111', 2));
+		k = KX[t];
+		k = k.uxor(spice[(i ^ 4)]);
+		k = k.uand(lmask);
+		k = KX[t.toNumber()+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
+		k = k.uand(lmask);
+		s0 = s0.uxor(k.ushln(8)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.sub(k.ushrn(GAP).uand(new BigNumber('00000000', 2))).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.sub(s0.ushln(LBH.toNumber())).umod(MOD);
+		s0 = s0.uand(lmask);
+		t = spice[(i ^ 1)].uxor(PI19.add(new BigNumber(blocksize.toString(2), 2)).umod(MOD));
+		s0 = s0.add(t.ushln(3)).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor(t.ushrn(GAP+2));
+		s0 = s0.uand(lmask);
+		s0 = s0.sub(t).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor(s0.ushrn(LBQ.toNumber()));
+		s0 = s0.uand(lmask);
+		let and = s0.uand(new BigNumber('1111', 2));
+		s0 = s0.add(permb[and]).umod(MOD);
+		s0 = s0.uand(lmask);
+		t = spice[(i^2)];
+		s0 = s0.uxor(t.ushrn(GAP+4));
+		s0 = s0.uand(lmask);
+		s0 = s0.add(s0.ushln(LBT.add(s0.uand(new BigNumber('1111', 2))).toNumber())).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.add(t).umod(MOD);
+		s0 = s0.uand(lmask);
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
+		s0 = s0.uand(lmask);
 	}
-	console.log("final s0: " + s0)
 	return s0;
 }
 
@@ -348,102 +305,56 @@ async function encryptHPCShort(plaintext) {
  * @param ciphertext: a value we want decrypted
  * @return a decrypted value
  */
-async function decryptHPCShort(ciphertext){
+function decryptHPCShort(ciphertext){
 	let s0 = ciphertext;
-	console.log("start s0: " + s0.toString(10))
 	let blocksize = 64;
-	let KX = await createKeyExpansionTable(2, 10);
+	let KX = createKeyExpansionTable(2, 10);
 	
 	// Several shift sizes are calculated:
-	let LBH = await new BigNumber((blocksize + 1) / 2); //division rounds down
-	let LBQ = await (LBH.add(new BigNumber('1', 2))).div(new BigNumber('10', 2));
-	let LBT = await (LBQ.add(new BigNumber(Number(blocksize).toString(2), 2))).div(new BigNumber('100', 2)).add(new BigNumber('10', 2));
+	let LBH = new BigNumber((blocksize + 1) / 2); //division rounds down
+	let LBQ = (LBH.add(new BigNumber('1', 2))).div(new BigNumber('10', 2));
+	let LBT = (LBQ.add(new BigNumber(Number(blocksize).toString(2), 2))).div(new BigNumber('100', 2)).add(new BigNumber('10', 2));
 	let GAP = 64 - blocksize;
-	console.log("LBH: " + LBH.toString(10))
-	console.log("LBQ: " + LBQ.toString(10))
-	console.log("LBT: " + LBT.toString(10))
-	console.log("GAP: " + GAP)
-	
 	
 	for(let i = 7; i >= 0; i--)
 	{
-		s0 = await s0.uxor(s0.ushrn(LBH.toNumber()));
-		 console.log("s0: " + s0.toString(10))
-		let t = await spice[(i^2)];
-		 console.log("t: " + t.toString(10))
-		s0 = await s0.sub(t).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		
-		// Inverse of s0 = s0.add(s0.shiftLeft(LBT.intValue() + s0.and(BigInteger.valueOf(15)).intValue())).mod(MOD);
-		t = await LBT.add(s0.uand(new BigNumber('1111', 2)));
-		 console.log("t: " + t.toString(10))
-		let b = await s0.ushln(Number(t))
-		let a = await s0.sub(b).ushln(Number(t))
-		s0 = await s0.sub(a).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		
-		t = await spice[(i^2)];
-		 console.log("t: " + t.toString(10))
-		s0 = await s0.uxor(t.ushrn(GAP+4)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		
-		 console.log("and with s0: " + s0.toString(10))
-		let and = await s0.uand(new BigNumber('1111', 2));
-		
-		
-		 console.log("and: " + and.toString(10))
-		
-		s0 = await s0.sub(permbi[and]).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		//Inverse of s0 = s0.xor(s0.shiftRight(LBQ.intValue())); is this:
-		s0 = await s0.uxor(s0.ushrn(LBQ.toNumber()));
-		 console.log("s0: " + s0.toString(10))
-		s0 = await s0.uxor(s0.ushrn(LBQ.mul(new BigNumber('10', 2)).toNumber()));
-		 console.log("s0: " + s0.toString(10))
-		t = spice[(i ^ 1)].uxor(PI19.add(new BigNumber(blocksize.toString(2), 2)).umod(MOD));
-		 console.log("t: " + t.toString(10))
-		s0 = s0.add(t).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		s0 = s0.uxor(t.ushrn(GAP+2));
-		 console.log("s0: " + s0.toString(10))
-		s0 = s0.sub(t.ushln(3)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		s0 = s0.add(s0.ushln(LBH.toNumber())).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		t = s0.uand(new BigNumber('11111111', 2));
-		 console.log("t: " + t.toString(10))
-		let k = KX[t];
-		 console.log("k: " + k.toString(10))
-		k = k.uxor(spice[(i ^ 4)]);
-		 console.log("k: " + k.toString(10))
-		k = KX[t.toNumber()+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
-		 console.log("k: " + k.toString(10))
-		s0 = s0.add(k.ushrn(GAP).uand(new BigNumber('00000000', 2))).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		s0 = s0.uxor(k.ushln(8)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
-		t = spice[(i ^ 7)];
-		 console.log("t: " + t.toString(10))
 		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
-		 console.log("s0: " + s0.toString(10))
+		let t = spice[(i^2)];
+		s0 = s0.sub(t).umod(MOD);
+		// Inverse of s0 = s0.add(s0.shiftLeft(LBT.intValue() + s0.and(BigInteger.valueOf(15)).intValue())).mod(MOD);
+		t = LBT.add(s0.uand(new BigNumber('1111', 2)));
+		let b = s0.ushln(Number(t))
+		let a = s0.sub(b).ushln(Number(t))
+		s0 = s0.sub(a).umod(MOD);
+		t = spice[(i^2)];
+		s0 = s0.uxor(t.ushrn(GAP+4)).umod(MOD);
+		let and = s0.uand(new BigNumber('1111', 2));
+		s0 = s0.sub(permbi[and]).umod(MOD);
+		//Inverse of s0 = s0.xor(s0.shiftRight(LBQ.intValue())); is this:
+		s0 = s0.uxor(s0.ushrn(LBQ.toNumber()));
+		s0 = s0.uxor(s0.ushrn(LBQ.mul(new BigNumber('10', 2)).toNumber()));
+		t = spice[(i ^ 1)].uxor(PI19.add(new BigNumber(blocksize.toString(2), 2)).umod(MOD));
+		s0 = s0.add(t).umod(MOD);
+		s0 = s0.uxor(t.ushrn(GAP+2));
+		s0 = s0.sub(t.ushln(3)).umod(MOD);
+		s0 = s0.add(s0.ushln(LBH.toNumber())).umod(MOD);
+		t = s0.uand(new BigNumber('11111111', 2));
+		let k = KX[t];
+		k = k.uxor(spice[(i ^ 4)]);
+		k = KX[t.toNumber()+3*i+1].add(k.ushrn(23)).add(k.ushln(41)).umod(MOD);
+		s0 = s0.add(k.ushrn(GAP).uand(new BigNumber('00000000', 2))).umod(MOD);
+		s0 = s0.uxor(k.ushln(8)).umod(MOD);
+		t = spice[(i ^ 7)];
+		s0 = s0.uxor(s0.ushrn(LBH.toNumber()));
 		s0 = s0.sub(t.ushrn(13));
-		 console.log("s0: " + s0.toString(10))
 		s0 = s0.add(t.ushrn(GAP+i));
-		 console.log("s0: " + s0.toString(10))
 		s0 = s0.uxor(t);
-		 console.log("s0: " + s0.toString(10))
 		s0 = s0.sub(s0.ushln(LBH.toNumber() + i)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
 		k = KX[s0.uand(new BigNumber('11111111', 2))].add(spice[i]);
-		 console.log("k: " + k.toString(10))
 		s0 = s0.uxor((k.ushrn(GAP)).uand(new BigNumber('00000000', 2)));
-		 console.log("s0: " + s0.toString(10))
 		s0 = s0.sub(k.ushln(8)).umod(MOD);
-		 console.log("s0: " + s0.toString(10))
 	}
-	console.log("penultimate s0: " + s0.toString(10))
 	s0 = s0.sub(KX[blocksize]).umod(MOD);
-	console.log("final s0: " + s0.toString(10))
 	return s0;
 }
 

@@ -71,16 +71,7 @@ router.get('/mapDestinationTag', requireLogin, (req, res) => {
 	let userID = req.session.user.id
 	let destinationTag = Promise.resolve(walletMapper.map(123456789000))
 	destinationTag.then(function(value){
-		console.log("value1: " + value)
 		destinationTag = value
-		console.log("destination1: " + destinationTag)
-		//for testing
-		let unmap = Promise.resolve(walletMapper.unmap(destinationTag))
-		unmap.then(function(value){
-			console.log("value2: " + value)
-			destinationTag = value
-			console.log("destination2: " + destinationTag)
-		})
 	})
 	
 	
