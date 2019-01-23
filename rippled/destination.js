@@ -1,5 +1,5 @@
 /**
- * http://usejsdoc.org/
+ * 	The destination of the funds to be sent.
  */
 function Destination(address, amount, tag, minAmount){
 	this.address = address
@@ -8,4 +8,8 @@ function Destination(address, amount, tag, minAmount){
 	this.minAmount = minAmount
 }
 
-module.exports = {Destination}
+function buildDestination(address, amount, tag){
+	return new Destination(address, amount, tag, amount)
+}
+
+module.exports = {Destination, buildDestination}

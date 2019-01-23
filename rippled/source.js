@@ -1,5 +1,5 @@
 /**
- * http://usejsdoc.org/
+ * The source of the funds to be sent.
  */
 function Source(address, amount, tag, maxAmount){
 	this.address = address
@@ -8,4 +8,8 @@ function Source(address, amount, tag, maxAmount){
 	this.maxAmount = maxAmount
 }
 
-module.exports = {Source}
+function buildSource(address, amount, tag){
+	return new Source(address, amount, tag, amount)
+}
+
+module.exports = {Source, buildSource}

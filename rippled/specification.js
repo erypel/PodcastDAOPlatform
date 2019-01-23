@@ -13,4 +13,8 @@ function Specification(source, destination, allowPartialPayment = false, invoice
 	this.paths = paths
 }
 
-module.exports = { Specification }
+function buildSpecification(source, destination){
+	return new Specification(source, destination)
+}
+
+module.exports = { Specification, buildSpecification }
