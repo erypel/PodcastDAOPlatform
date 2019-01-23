@@ -6,4 +6,8 @@ function Amount(value){
 	this.value = value
 }
 
-module.exports = {Amount}
+function buildAmount(amount){
+	return {currency: amount.currency, value: amount.value}
+}
+
+module.exports = {Amount, buildAmount}

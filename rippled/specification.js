@@ -2,6 +2,8 @@
  * This is the specification for Payment transactions. It specifies what a 
  * transaction should do
  */
+const Source = require('./source')
+const Dest = require('./destination')
 function Specification(source, destination, allowPartialPayment = false, invoiceID = "", limitQuality = false, memos = [], noDirectRipple = false, paths = "") {
 	this.source = source
 	this.destination = destination
@@ -14,7 +16,8 @@ function Specification(source, destination, allowPartialPayment = false, invoice
 }
 
 function buildSpecification(source, destination){
-	return new Specification(source, destination)
+	let spec = new Specification(source, destination)
+	return {source: source, destination: destination}
 }
 
 module.exports = { Specification, buildSpecification }

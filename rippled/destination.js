@@ -1,6 +1,8 @@
 /**
  * 	The destination of the funds to be sent.
  */
+const Amount = require('./amount')
+
 function Destination(address, amount, tag, minAmount){
 	this.address = address
 	this.amount = amount
@@ -9,7 +11,8 @@ function Destination(address, amount, tag, minAmount){
 }
 
 function buildDestination(address, amount, tag){
-	return new Destination(address, amount, tag, amount)
+	let destination = new Destination(address, amount, tag, amount)
+	return {address: destination.address, amount: Amount.buildAmount(destination.amount), tag: destination.tag, minAmount: Amount.buildAmount(destination.minAmount)}
 }
 
 module.exports = {Destination, buildDestination}

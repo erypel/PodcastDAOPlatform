@@ -1,6 +1,8 @@
 /**
  * The source of the funds to be sent.
  */
+const Amount = require('./amount')
+
 function Source(address, amount, tag, maxAmount){
 	this.address = address
 	this.amount = amount
@@ -9,7 +11,8 @@ function Source(address, amount, tag, maxAmount){
 }
 
 function buildSource(address, amount, tag){
-	return new Source(address, amount, tag, amount)
+	let source = new Source(address, amount, tag, amount)
+	return {address: source.address, amount: Amount.buildAmount(source.amount), tag: source.tag, maxAmount: Amount.buildAmount(source.maxAmount)}
 }
 
 module.exports = {Source, buildSource}
