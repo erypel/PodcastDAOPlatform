@@ -61,6 +61,10 @@ function appendToRSS(podcast){
 	rss.appendToRSS(podcast)
 }
 
+function getUploaderID(podcastID){
+	return knex('podcast').select('owner_id').where({id: podcastID})
+}
+
 module.exports = {
 	savePodcastToDB(req, res, {episode_name, description, owner_id}) {
 		console.log(rss)
@@ -76,5 +80,6 @@ module.exports = {
 	      })
 	},
 	uploadPodcast,
-	getAllPodcasts
+	getAllPodcasts,
+	getUploaderID
 }
