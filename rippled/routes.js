@@ -59,19 +59,23 @@ function requireLogin (req, res, next) {
 //END DUPLICATES
 
 router.post('/tip', requireLogin, (req, res) => {
-	let userID = req.session.user.id
+	let tipperUserID = req.session.user.id
 	let podcastID = req.body.podcastID
 	podcastStore.getUploaderID(podcastID).then((result) => {
 		console.log(result)
 		let uploaderID = result[0].owner_id
-		if(uploaderID == userID){
+		if(uploaderID == tipperUserID){
 			res.status(400).send('You can\'t tip yourself, silly goose!\n<form action="/podcast" method = "get"><button>Return to Podcasts</button></form>')
 			return {success: false}
 		}
 		return {success: true, uploaderID: uploaderID}
 	}).then((result) => {
 		if(result.success) {
-			transaction.tipUser()
+			transaction.tipUser(tipperUserID, result.uploaderID, '1.00000000').then((function(response){
+				
+			}), function(error) {
+				res.status(400).send(error + '\n<form action="/podcast" method = "get"><button>Return to Podcasts</button></form>')
+			})
 		}
 	})
 })

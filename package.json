@@ -9,6 +9,7 @@
     "bn.js": "^4.11.8",
     "body-parser": "^1.18.3",
     "client-sessions": "^0.8.0",
+    "decimal.js": "^10.0.2",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-fileupload": "^1.1.1-alpha.1",
