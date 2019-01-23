@@ -3,6 +3,7 @@
  */
 const walletStore = require('../wallet/walletStore')
 const Decimal = require('decimal.js')
+const daoAddress = 'rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6'
 
 function tipUser(sourceUserID, destinationUserID, amount) {
 	return new Promise(function(resolve, reject) {
@@ -24,7 +25,7 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 }
 
 // BEGIN TRANSACTION FLOW METHODS
-function prepareTransaction(){
+function preparePaymentTransaction(){
 	
 }
 
