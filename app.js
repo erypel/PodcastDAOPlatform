@@ -4,7 +4,6 @@
  */
 const express = require('express')
 const app = express()
-const userStore = require('./authentication/store')
 app.set('view engine', 'ejs');
 
 //Routes
