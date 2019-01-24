@@ -28,6 +28,7 @@ Balance
  * secret: snKixQChzs9KcBxxrYWpm97sxnA1e
  */
 const daoAddress = 'rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6'
+const daoSecret = 'snKixQChzs9KcBxxrYWpm97sxnA1e'
 
 function tipUser(sourceUserID, destinationUserID, amount) {
 	return new Promise(function(resolve, reject) {
@@ -42,13 +43,13 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 			else{
 				let amountAsDrops = amountAsDecimal.mul(100000) //convert XRP to drops
 				let tipAmount = new Amount(amountAsDrops.toString())
-				let s = source.buildSource(daoAddress, tipAmount, hpc.map(sourceUserID).toString(10).substring(0, 10))
-				let d = destination.buildDestination(daoAddress, tipAmount, hpc.map(destinationUserID).toString(10).substring(0, 10))
+				let s = source.buildSource(daoAddress, tipAmount, Number(hpc.map(sourceUserID).toString(10).substring(0, 10)))
+				let d = destination.buildDestination(daoAddress, tipAmount, Number(hpc.map(destinationUserID).toString(10).substring(0, 10)))
 				let payment = specification.buildSpecification(s, d)
-				console.log(s)
-				console.log(d)
-				console.log(payment)
-				payment = { 
+				/*
+				 * We want payment objects to look like this:
+				 * 
+				 * payment = { 
 					"source": { 
 						"address": "rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6", 
 						"tag": 1176135248, 
@@ -67,7 +68,7 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 					} 
 				}
 				
-				/*payment = {
+				payment = {
 						  "source": {
 							    "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
 							    "maxAmount": {
@@ -84,7 +85,8 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 							      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
 							    }
 							  }
-							}*/
+							}
+				*/
 				preparePaymentTransaction(daoAddress, payment)
 			}
 		})
@@ -102,6 +104,7 @@ function preparePaymentTransaction(address, payment){
 	}).then(prepared => {
 		console.log(prepared)
 		console.log('preparePayment done')
+		signTransaction(prepared.txJSON, daoSecret)
 	}).then(() => {
 		return api.disconnect()
 	}).then(() => {
@@ -109,8 +112,18 @@ function preparePaymentTransaction(address, payment){
 	}).catch(console.error)
 }
 
-function signTransaction(){
-	
+function signTransaction(txJSON, secret){
+	api.connect().then(() => {
+		console.log('signing transaction')
+		return api.sign(txJSON, secret)
+	}).then(prepared => {
+		console.log(prepared)
+		console.log('signing done')
+	}).then(() => {
+		return api.disconnect()
+	}).then(() => {
+		console.log('done and disconnected')
+	}).catch(console.error)
 }
 
 function submitTransaction(){

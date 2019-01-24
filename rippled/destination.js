@@ -12,7 +12,7 @@ function Destination(address, amount, tag, minAmount){
 
 function buildDestination(address, amount, tag){
 	let destination = new Destination(address, amount, tag, amount)
-	return {address: destination.address, amount: Amount.buildAmount(destination.amount), tag: destination.tag, minAmount: Amount.buildAmount(destination.minAmount)}
+	return {address: destination.address, amount: Amount.buildAmount(destination.amount), tag: destination.tag}
 }
 
 module.exports = {Destination, buildDestination}

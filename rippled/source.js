@@ -12,7 +12,7 @@ function Source(address, amount, tag, maxAmount){
 
 function buildSource(address, amount, tag){
 	let source = new Source(address, amount, tag, amount)
-	return {address: source.address, amount: Amount.buildAmount(source.amount), tag: source.tag, maxAmount: Amount.buildAmount(source.maxAmount)}
+	return {address: source.address, tag: source.tag, maxAmount: Amount.buildAmount(source.maxAmount)}
 }
 
 module.exports = {Source, buildSource}
