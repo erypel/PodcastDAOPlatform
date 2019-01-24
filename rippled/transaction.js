@@ -106,7 +106,7 @@ function preparePaymentTransaction(address, payment){
 		console.log('preparePayment done')
 		signTransaction(prepared.txJSON, daoSecret)
 	}).then(() => {
-		return api.disconnect()
+		//return api.disconnect()
 	}).then(() => {
 		console.log('done and disconnected')
 	}).catch(console.error)
@@ -116,9 +116,25 @@ function signTransaction(txJSON, secret){
 	api.connect().then(() => {
 		console.log('signing transaction')
 		return api.sign(txJSON, secret)
-	}).then(prepared => {
-		console.log(prepared)
+	}).then(signed => {
+		console.log(signed)
 		console.log('signing done')
+		submitTransaction(signed.signedTransaction)
+	}).then(() => {
+		//return api.disconnect()
+	}).then(() => {
+		console.log('done and disconnected')
+	}).catch(console.error)
+}
+
+function submitTransaction(signedTransaction){
+	api.connect().then(() => {
+		console.log('submitting transaction')
+		return api.submit(signedTransaction)
+	}).then(result => {
+		console.log(result)
+		console.log('submitted')
+		verifyTransaction(result.id)
 	}).then(() => {
 		return api.disconnect()
 	}).then(() => {
@@ -126,12 +142,18 @@ function signTransaction(txJSON, secret){
 	}).catch(console.error)
 }
 
-function submitTransaction(){
-	
-}
-
-function verifyTransaction(){
-	
+function verifyTransaction(transactionID){
+	api.connect().then(() => {
+		console.log('verifying transaction')
+		return api.getTransaction(transactionID)
+	}).then(result => {
+		console.log(result)
+		console.log('verified')
+	}).then(() => {
+		return api.disconnect()
+	}).then(() => {
+		console.log('done and disconnected')
+	}).catch(console.error)
 }
 // END TRANSACTION FLOW METHODS
 module.exports = {
