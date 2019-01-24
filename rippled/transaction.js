@@ -41,11 +41,36 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 				reject('Insufficient funds to tip ' + amount + 'XRP')
 			}
 			else{
+				//TODO need error handling here and to roll back first transaction should second fail
+				//mayb there is a way to do transactions in batches
+				let tipperNewBalance = balanceAsDecimal.sub(amountAsDecimal)
+				walletStore.updateUserBalance(sourceUserID, tipperNewBalance.toString()).then((result) => {
+					if(result){
+						walletStore.getUserBalance(destinationUserID).then((balance) => {
+							let tippeeBalance = new Decimal(balance)
+							let tippeeNewBalance = tippeeBalance.add(amountAsDecimal)
+							console.log("tippeeNewBalance", tippeeNewBalance.toString())
+							walletStore.updateUserBalance(destinationUserID, tippeeNewBalance.toString()).then((result) => {
+								if(result){
+									resolve('Tipped ' + amount + 'XRP')
+								}
+								else{
+									//TODO need to roll everything back
+								}
+							})
+							
+						})
+					}
+					else{
+						console.log('error: ' + result)
+					}
+				})
+				/*
 				let amountAsDrops = amountAsDecimal.mul(100000) //convert XRP to drops
 				let tipAmount = new Amount(amountAsDrops.toString())
 				let s = source.buildSource(daoAddress, tipAmount, Number(hpc.map(sourceUserID).toString(10).substring(0, 10)))
 				let d = destination.buildDestination(daoAddress, tipAmount, Number(hpc.map(destinationUserID).toString(10).substring(0, 10)))
-				let payment = specification.buildSpecification(s, d)
+				let payment = specification.buildSpecification(s, d)*/
 				/*
 				 * We want payment objects to look like this:
 				 * 
@@ -87,7 +112,7 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 							  }
 							}
 				*/
-				preparePaymentTransaction(daoAddress, payment)
+				//preparePaymentTransaction(daoAddress, payment)
 			}
 		})
 	})
@@ -96,6 +121,7 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 }
 
 // BEGIN TRANSACTION FLOW METHODS
+//TODO these are nested calls and problems can occur if the api connection is severed too early. need to Un-nest
 function preparePaymentTransaction(address, payment){
 	api.connect().then(() => {
 		

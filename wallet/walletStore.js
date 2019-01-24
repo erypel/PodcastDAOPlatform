@@ -14,6 +14,11 @@ module.exports = {
 			return rowDataPacket[0].funds
 		})
 	},
+	updateUserBalance(ownerID, newBalance){
+		console.log("owner id:", ownerID)
+		console.log("new balance:", newBalance)
+		return knex('wallet').where({owner_id: ownerID}).update({funds: newBalance})
+	},
 	createWallet(ownerID){
 		console.log(`Creating wallet for user with ID: ${ownerID}`)
 		return knex('wallet').insert({

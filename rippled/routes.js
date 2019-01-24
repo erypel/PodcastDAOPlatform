@@ -72,7 +72,7 @@ router.post('/tip', requireLogin, (req, res) => {
 	}).then((result) => {
 		if(result.success) {
 			transaction.tipUser(tipperUserID, result.uploaderID, '1.00000000').then((function(response){
-				
+				res.status(200).send(response + '\n<form action="/podcast" method = "get"><button>Return to Podcasts</button></form>')
 			}), function(error) {
 				res.status(400).send(error + '\n<form action="/podcast" method = "get"><button>Return to Podcasts</button></form>')
 			})
