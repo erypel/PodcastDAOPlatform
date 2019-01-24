@@ -6,11 +6,10 @@ const router = express.Router()
 const session = require('client-sessions')
 const bodyParser = require('body-parser')
 const userStore = require('./authentication/store')
+const requireLogin = require('./authentication/session').requireLogin
 
 router.use(express.static('authentication'))
 router.use(bodyParser.json())
-
-//DUPLICATE
 
 //Middle ware that is specific to this router
 router.use(function timeLog(req, res, next) {
@@ -49,24 +48,6 @@ router.use(function(req, res, next) {
 		next()
 	}
 })
-
-/**
- * check if a user is logged in and redirect them if they're not
- * @param req
- * @param res
- * @param next
- * @returns
- */
-function requireLogin (req, res, next) {
-	console.log("login required")
-  if (!req.user) {
-    res.redirect('/login');
-  } else {
-    next();
-  }
-}
-
-//END DUPLICATE
 
 router.get('/', function(req, res) {
 	res.render("login")
