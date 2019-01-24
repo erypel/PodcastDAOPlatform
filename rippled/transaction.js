@@ -30,6 +30,8 @@ Balance
 const daoAddress = 'rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6'
 const daoSecret = 'snKixQChzs9KcBxxrYWpm97sxnA1e'
 
+//TODO consider re-authentication when moving lots of $$$ https://www.owasp.org/index.php/Transaction_Authorization_Cheat_Sheet	
+	
 function tipUser(sourceUserID, destinationUserID, amount) {
 	return new Promise(function(resolve, reject) {
 		walletStore.getUserBalance(sourceUserID).then((balance) => {
