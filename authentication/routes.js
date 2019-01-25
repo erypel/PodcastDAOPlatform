@@ -27,9 +27,32 @@ router.get('/createUser', function(req, res) {
 // TODO need to create secure password recovery: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet
 
 router.post('/createUser', (req, res) => {
-	// As per OWASP recommendations, User IDs should be case insensitive //TODO store in db in lowercase
-	
-	// User IDs should be unique. //TODO check for uniqueness
+	let password = req.body.password
+	let validPassword = userStore.validatePassword(password)
+	let username = req.body.username
+	// User IDs should be unique, check for uniqueness
+	userStore.getUser(username).then((existingUser) => {
+		if(existingUser){
+			res.statusMessage = 'Username not available.'
+			res.status(400).end()
+		}
+		else{
+			if(validPassword.success){
+				userStore.createUser({
+					username: username,
+					email: req.body.email,
+					password: password
+				}).then((result) => {
+					walletStore.createWallet(result)
+					res.sendStatus(200)
+				})
+			}
+			else{
+				res.statusMessage = validPassword.message
+				res.status(400).end()
+			}
+		}
+	})
 	
 	// Validate password is sufficiently secure
 	
@@ -39,36 +62,7 @@ router.post('/createUser', (req, res) => {
 	// 		Ban commonly used password topologies
 	//		Force multiple users to use different password topologies
 	//		Require a minimum toplology change between old and new passwords
-	/*
-	 * OWASP defines a strong password as:
-	 * 
-	 * 1) Password Length
-	 * 		Minimum length should be enforced by the application
-	 * 		Passwords shorter than 10 characters are considered weak
-	 * 		Typical maximum password length is 128 characters
-	 * 		Passphrases shorter than 20 characters are usually considered weak if they only consist of lower case latin characters
-	 * 2) Password Complexity
-	 * 		The application should enforce password complexity rules to discourage easy passwords
-	 * 		Password mechanisms should allow virtually any character the user can type including spaces
-	 * 		Passwords should be case sensitive
-	 * 		An example of basic complexity checking would be:
-	 * 			password must contain 3/4 of the following rules:
-	 * 				at least 1 uppercase character (A-Z)
-	 * 				at least 1 lowercase character (a-z)
-	 * 				at least 1 digit (0-9)
-	 * 				at least 1 special character
-	 * 			at least 10 characters
-	 * 			at most 128 characters
-	 * 			not more than 2 identicaly characters in a row (e.g., 111 not allowed)
-	 */
-	userStore.createUser({
-		username: req.body.username,
-		email: req.body.email,
-		password: req.body.password
-	}).then((result) => {
-		walletStore.createWallet(result)
-		res.sendStatus(200)
-		})
+	
 })
 
 router.post('/login', (req, res) => {

@@ -9,7 +9,7 @@ CreateUser.addEventListener('submit', (e) => {
   const password = CreateUser.querySelector('.password').value
   post('/createUser', { username, email, password }).then(function(res){
 	  
-	  // TODO Error messages shoudl be appropiate here:
+	  // TODO Error messages should be appropriate here:
 	  /*
 		 * Authentication Responses An application should respond with a generic
 		 * error message regardless of whether the user ID or password was
@@ -30,6 +30,11 @@ CreateUser.addEventListener('submit', (e) => {
 		 * response code may differ which can leak information about whether the
 		 * account is valid or not.
 		 */
-	  if(res.status == 200) window.location.href = "http://localhost:3000/login"
+	  if(res.status == 200){
+		  window.location.href = "http://localhost:3000/login"
+	  }
+	  else{
+		  alert(res.statusText)
+	  }
   })
 })
