@@ -9,8 +9,6 @@ const bodyParser = require('body-parser')
 
 router.use(bodyParser.json())
 
-// TODO make sure passwords are being transmitted only over TLS: https://www.owasp.org/index.php/Transport_Layer_Protection_Cheat_Sheet
-
 router.get('/login', function(req, res) {
 	res.render("login")
 })
@@ -28,7 +26,7 @@ router.get('/createUser', function(req, res) {
 // Password topologies:
 	// 		Ban commonly used password topologies
 	//		Force multiple users to use different password topologies
-	//		Require a minimum toplology change between old and new passwords
+	//		Require a minimum topology change between old and new passwords
 	
 router.post('/createUser', (req, res) => {
 	let password = req.body.password
