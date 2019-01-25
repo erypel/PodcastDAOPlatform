@@ -25,9 +25,14 @@ router.get('/createUser', function(req, res) {
 })
 
 // TODO need to create secure password recovery: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet
-
+// Password topologies:
+	// 		Ban commonly used password topologies
+	//		Force multiple users to use different password topologies
+	//		Require a minimum toplology change between old and new passwords
+	
 router.post('/createUser', (req, res) => {
 	let password = req.body.password
+	// Validate password is sufficiently secure
 	let validPassword = userStore.validatePassword(password)
 	let username = req.body.username
 	// User IDs should be unique, check for uniqueness
@@ -37,6 +42,7 @@ router.post('/createUser', (req, res) => {
 			res.status(400).end()
 		}
 		else{
+			//If the username is unique and has a valid password, create the user
 			if(validPassword.success){
 				userStore.createUser({
 					username: username,
@@ -53,20 +59,9 @@ router.post('/createUser', (req, res) => {
 			}
 		}
 	})
-	
-	// Validate password is sufficiently secure
-	
-	// make sure that passwords are not truncated!
-	
-	// Password topologies:
-	// 		Ban commonly used password topologies
-	//		Force multiple users to use different password topologies
-	//		Require a minimum toplology change between old and new passwords
-	
 })
 
 router.post('/login', (req, res) => {
-	//TODO UserIDs are store in lowercase in DB. Convert username to lowercase
 	userStore.authenticate({
 		username: req.body.username,
 		password: req.body.password
