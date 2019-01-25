@@ -68,6 +68,23 @@ function validatePassword(password){
 	}
 }
 
+function resetLockCount(user){
+	return knex('user').where({id: user.id}).update({lock_count: 0})
+}
+
+function incrementLockCount(user){
+	//if the user's lock count is 2, they are just about to be locked out. Unlock their account after 1 minute
+	if(user.lock_count === 2){
+		setTimeout(function(){
+			console.log('unlocking user', user)
+			resetLockCount(user).then(()=>{
+				console.log('user unlocked')
+			})
+		}, 60*1000)
+	}
+	return knex('user').increment('lock_count').where({id: user.id})
+}
+
 module.exports = {
 		randomString, //put this somewhere else
 		validatePassword,
@@ -89,14 +106,29 @@ module.exports = {
 		    console.log(`Authenticating user ${username}`)
 		    return knex('user').where({ username })
 		      .then(([user]) => {
-		        if (!user) return { success: false }
+		        if (!user) return { success: false, message: 'Login failed; Invalid userID or password' }
+		        if(user.lock_count >= 3) return { success: false, message: 'User is locked.'}
 		        const { hash } = saltHashPassword({
 		          password,
 		          salt: user.salt
 		        })
-		        return { 
-		        	success: hash === user.encrypted_password,
-		        	user: user 
+		        // increment lock count if the user inputs the wrong password
+		        if(hash != user.encrypted_password){
+		        	return incrementLockCount(user).then(() => {
+		        		return { 
+				        	success: false,
+				        	message: 'Login failed; Invalid userID or password' 
+				        }
+		        	})
+		        }
+		        else{
+		        	//reset lock count on a successful login
+		        	return resetLockCount(user).then(() =>{
+		        		return { 
+			        		success: hash === user.encrypted_password,
+			        		user: user 
+			        	}
+		        	})
 		        }
 		      })
 		  },

@@ -71,7 +71,10 @@ router.post('/login', (req, res) => {
 			req.session.user = user
 			res.sendStatus(200)
 		}
-		else res.sendStatus(401)
+		else{
+			res.statusMessage = success.message
+			res.sendStatus(400)
+		}
 	})
 })
 
