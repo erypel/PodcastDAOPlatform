@@ -7,6 +7,7 @@ const session = require('client-sessions')
 const bodyParser = require('body-parser')
 const userStore = require('./authentication/store')
 const requireLogin = require('./authentication/session').requireLogin
+const utils = require('./utils/utils')
 
 router.use(express.static('authentication'))
 router.use(bodyParser.json())
@@ -18,7 +19,7 @@ router.use(function timeLog(req, res, next) {
 
 router.use(session({
 	cookieName: 'session',
-	secret: userStore.randomString(),
+	secret: utils.randomString(),
 	duration: 30 * 60 * 1000,//in millis, 30 minutes for now, probably want more
 	activeDuration: 5 * 60 * 1000, //add 5 more minutes of session time if user interacts with page
 	httpOnly: true, //prevent browser js from accessing cookies

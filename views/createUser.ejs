@@ -7,11 +7,23 @@
 <body>
 	<!-- 
 	TODO LIST
-	* check that username doesn't already exist before form submission
 	* check that password is adequately complex
+	
+	Need to display the password policies here explicitly
+	
+	If a new password doesn't comply with the complexity policies, the error
+	message should display every broken rule instead of just the first one
 	 -->
 	<form class="CreateUser">
 		<h1>Create a new user</h1>
+		<h2>Passwords must meet these conditions: </h2>
+		<ul>
+			<li>At least one uppercase english letter [A-Z]</li>
+			<li>At least one lowercase english letter [a-z]</li>
+			<li>At least one digit [0-9]</li>
+			<li>At least one special character [#?!@ $%^&*-]</li>
+			<li>Minimum length 10, maximum length 128</li>
+		</ul>
 		<input type="text" class="username" placeholder="username" required> 
 		<input type="text" class="email" placeholder="email"> 
 		<input type="password" class="password" placeholder="password" required> 
