@@ -65,15 +65,16 @@ router.post('/login', (req, res) => {
 	userStore.authenticate({
 		username: req.body.username,
 		password: req.body.password
-	}).then(({success, user}) => {
+	}).then(({success, user, message}) => {
 		if(success) {
 			// set cookie with the user's info. Might want to use something else later
 			req.session.user = user
 			res.sendStatus(200)
 		}
 		else{
-			res.statusMessage = success.message
-			res.sendStatus(400)
+			console.log(message)
+			res.statusMessage = message
+			res.status(400).end()
 		}
 	})
 })
