@@ -3,43 +3,39 @@
  */
 const crypto = require('crypto')
 const knex = require('knex')(require('../knexfile'))
+const utils = require('../utils/utils')
+
+// BEGIN UTILITY FUNCTIONS
 
 function validatePassword(password){
 	/*
 	 * OWASP defines a strong password as:
 	 * 
-	 * 1) Password Length
-	 * 		Minimum length should be enforced by the application
-	 * 		Passwords shorter than 10 characters are considered weak
-	 * 		Typical maximum password length is 128 characters
-	 * 		Passphrases shorter than 20 characters are usually considered weak if they only consist of lower case latin characters
-	 * 2) Password Complexity
-	 * 		The application should enforce password complexity rules to discourage easy passwords
-	 * 		Password mechanisms should allow virtually any character the user can type including spaces
-	 * 		Passwords should be case sensitive
-	 * 		An example of basic complexity checking would be:
-	 * 			password must contain 3/4 of the following rules:
-	 * 				at least 1 uppercase character (A-Z)
-	 * 				at least 1 lowercase character (a-z)
-	 * 				at least 1 digit (0-9)
-	 * 				at least 1 special character
-	 * 			at least 10 characters
-	 * 			at most 128 characters
-	 * 			not more than 2 identicaly characters in a row (e.g., 111 not allowed)
+	 * 1) Password Length Minimum length should be enforced by the application
+	 * Passwords shorter than 10 characters are considered weak Typical maximum
+	 * password length is 128 characters Passphrases shorter than 20 characters
+	 * are usually considered weak if they only consist of lower case latin
+	 * characters 2) Password Complexity The application should enforce password
+	 * complexity rules to discourage easy passwords Password mechanisms should
+	 * allow virtually any character the user can type including spaces
+	 * Passwords should be case sensitive An example of basic complexity
+	 * checking would be: password must contain 3/4 of the following rules: at
+	 * least 1 uppercase character (A-Z) at least 1 lowercase character (a-z) at
+	 * least 1 digit (0-9) at least 1 special character at least 10 characters
+	 * at most 128 characters not more than 2 identicaly characters in a row
+	 * (e.g., 111 not allowed)
 	 */
 	
 	/*
-	 * This regex enforces these rules:
-	 * 1) At least one uppercase english letter [A-Z]
-	 * 2) At least one lowercase english letter [a-z]
-	 * 3) At least one digit [0-9]
-	 * 4) At least one special character [#?!@$% ^&*-]
-	 * 5) Minimum length 10, maximum length 128
+	 * This regex enforces these rules: 1) At least one uppercase english letter
+	 * [A-Z] 2) At least one lowercase english letter [a-z] 3) At least one
+	 * digit [0-9] 4) At least one special character [#?!@$% ^&*-] 5) Minimum
+	 * length 10, maximum length 128
 	 */
 	let regex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{10,128}$/
 	let result = regex.test(password)
 	if(!result){
-		//build error message
+		// build error message
 		let message = "Your password does not meet the following requirement(s):"
 		let upperCaseRegex = /^.*[A-Z].*$/
 		let lowerCaseRegex = /^.*[a-z].*$/ 
@@ -68,7 +64,7 @@ function validatePassword(password){
 	}
 }
 
-//want to prevent brute force login attempts
+// want to prevent brute force login attempts
 /*
  * If an attacker is able to guess passwords without the account becoming
  * disabled due to failed authentication attempts, the attacker has an
@@ -95,7 +91,8 @@ function resetLockCount(user){
 }
 
 function incrementLockCount(user){
-	//if the user's lock count is 2, they are just about to be locked out. Unlock their account after 1 minute
+	// if the user's lock count is 2, they are just about to be locked out.
+	// Unlock their account after 1 minute
 	if(user.lock_count === 2){
 		setTimeout(function(){
 			console.log('unlocking user', user)
@@ -107,79 +104,16 @@ function incrementLockCount(user){
 	return knex('user').increment('lock_count').where({id: user.id})
 }
 
-module.exports = {
-		randomString, //put this somewhere else
-		validatePassword,
-		saltHashPassword,
-		// As per OWASP recommendations, User IDs should be case insensitive, so we'll store them in lower case
-		createUser ({username, email, password}) {
-			 username = username.toLowerCase() // username should be lower case in the DB
-			 console.log(`Add user ${username}`)
-			 const {salt, hash} = saltHashPassword({password})
-			 return knex('user').insert({
-				 username,
-				 email,
-				 salt,
-				 encrypted_password: hash
-			 }, 'id') //returns id in order to generate wallet
-		},
-		authenticate ({ username, password }) {
-			username = username.toLowerCase() // username should be lower case in the DB
-		    console.log(`Authenticating user ${username}`)
-		    return knex('user').where({ username })
-		      .then(([user]) => {
-		        if (!user) return { success: false, message: 'Login failed. Invalid userID or password' }
-		        if(user.lock_count >= 3) return { success: false, message: 'User is locked.'}
-		        const { hash } = saltHashPassword({
-		          password,
-		          salt: user.salt
-		        })
-		        // increment lock count if the user inputs the wrong password
-		        if(hash != user.encrypted_password){
-		        	return incrementLockCount(user).then(() => {
-		        		return { 
-				        	success: false,
-				        	message: 'Login failed. Invalid userID or password' 
-				        }
-		        	})
-		        }
-		        else{
-		        	//reset lock count on a successful login
-		        	return resetLockCount(user).then(() =>{
-		        		return { 
-			        		success: hash === user.encrypted_password,
-			        		user: user 
-			        	}
-		        	})
-		        }
-		      })
-		  },
-		  getUser(username){
-			  username = username.toLowerCase() // username should be lower case in the DB
-			  return knex('user').where({username: username}).first()
-		  },
-		  getUserID(username) {
-			  username = username.toLowerCase() // username should be lower case in the DB
-			  console.log(`${username}`)
-			  let test = knex('user').where({username}).select('id')
-			  console.log('test ' + test)
-			  return knex('user').select('id').where({username}).first()
-		  }
-}
-
-//TODO make sure we are storing passwords in a secure fashion: https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet
-
-/** 
- * we want to store encrypted passwords in the DB
- * Accept a salt and only generate one if none is 
- * supplied
+/**
+ * we want to store encrypted passwords in the DB Accept a salt and only
+ * generate one if none is supplied
  * 
- * @param {password:MISSING,salt:randomString()}
+ * @param {password:MISSING,salt:utils.randomString()}
  * @returns
  */
 function saltHashPassword ({
 	  password,
-	  salt = randomString()
+	  salt = utils.randomString()
 	}) {
 	  const hash = crypto
 	    .createHmac('sha512', salt)
@@ -190,6 +124,77 @@ function saltHashPassword ({
 	  }
 	}
 
-function randomString(){
-	return crypto.randomBytes(4).toString('hex')
+function authenticate ({ username, password }) {
+	username = username.toLowerCase() // username should be lower case in the
+										// DB
+    console.log(`Authenticating user ${username}`)
+    return knex('user').where({ username })
+      .then(([user]) => {
+        if (!user) return { success: false, message: 'Login failed. Invalid userID or password' }
+        if(user.lock_count >= 3) return { success: false, message: 'User is locked.'}
+        const { hash } = saltHashPassword({
+          password,
+          salt: user.salt
+        })
+        // increment lock count if the user inputs the wrong password
+        if(hash != user.encrypted_password){
+        	return incrementLockCount(user).then(() => {
+        		return { 
+		        	success: false,
+		        	message: 'Login failed. Invalid userID or password' 
+		        }
+        	})
+        }
+        else{
+        	// reset lock count on a successful login
+        	return resetLockCount(user).then(() =>{
+        		return { 
+	        		success: hash === user.encrypted_password,
+	        		user: user 
+	        	}
+        	})
+        }
+      })
+  }
+// END UTILITY FUNCTIONS
+
+// BEGIN CRUD FUNCTIONS
+// TODO make sure we are storing passwords in a secure fashion:
+// https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet
+function createUser ({username, email, password}) {
+	// As per OWASP recommendations, User IDs should be case insensitive, so
+	// we'll store them in lower case
+	 username = username.toLowerCase()
+	 console.log(`Add user ${username}`)
+	 const {salt, hash} = saltHashPassword({password})
+	 return knex('user').insert({
+		 username,
+		 email,
+		 salt,
+		 encrypted_password: hash
+	 }, 'id') // returns id in order to generate wallet
+}
+
+function getUser(username){
+	  username = username.toLowerCase() // username should be lower case in the
+										// DB
+	  return knex('user').where({username: username}).first()
+}
+
+function getUserID(username) {
+	  username = username.toLowerCase() // username should be lower case in the
+										// DB
+	  console.log(`${username}`)
+	  let test = knex('user').where({username}).select('id')
+	  console.log('test ' + test)
+	  return knex('user').select('id').where({username}).first()
+  }
+
+module.exports = {
+		validatePassword,
+		saltHashPassword,
+		createUser,
+		authenticate,
+		getUser,
+		getUserID
 }

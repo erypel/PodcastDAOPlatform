@@ -8,8 +8,6 @@ CreateUser.addEventListener('submit', (e) => {
   const email = CreateUser.querySelector('.email').value
   const password = CreateUser.querySelector('.password').value
   post('/createUser', { username, email, password }).then(function(res){
-	  
-	  // TODO Error messages should be appropriate here:
 	  /*
 		 * Authentication Responses An application should respond with a generic
 		 * error message regardless of whether the user ID or password was
