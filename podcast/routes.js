@@ -9,6 +9,7 @@ const podcastStore = require('./podcastStore')
 const rssStore = require('../rss/rssStore')
 const session = require('../authentication/session')
 const fs = require('fs')
+const utils = require('../utils/utils')
 
 router.use(fileupload())
 router.use(bodyParser.json())
@@ -25,21 +26,23 @@ router.get('/podcast', session.requireLogin, (req, res) => {
 	})
 })
 
-// define a route music it creates readstream to the requested 
-// file and pipes the output to response
+/**
+ * creates readstream to the requested file and pipes the output to response
+ * 
+ * @param req
+ * @param res
+ * @returns
+ */ 
 router.get('/play', function(req, res) {
-	//TODO definitely don't want to be passing the path around like this.
-	//TODO fix in the future. maybe save path segment in db instead of whole path
-	let path = req.query.path;
+	let path = utils.getPathToFileStore() + req.query.path
 	console.log("file: " + path)
 	fs.exists(path, function(exists){
 		if(exists){
-			let rstream = fs.createReadStream(path);
-			rstream.pipe(res);
+			let rstream = fs.createReadStream(path)
+			rstream.pipe(res)
 		}
 		else {
-			res.send('404')
-			res.end()
+			res.sendStatus(400)
 		}
 	})
 })
@@ -54,13 +57,12 @@ router.get('/download', (req, res) => {
 		{
 			res.setHeader('Content-disposition', 'attachment; filename=' + fileId);
 			res.setHeader('Content-Type', 'application/audio/mpeg3')
-			var rstream = fs.createReadStream(file);
-			rstream.pipe(res);
+			var rstream = fs.createReadStream(file)
+			rstream.pipe(res)
 		}
 		else
 		{
-			res.send("404");
-			res.end();
+			res.sendStatus(400)
 		}
 	});
 })
@@ -70,14 +72,14 @@ router.post('/uploadPodcast', (req, res, next) => {
 		episode_name: req.body.episodeName, 
 		description: req.body.episodeDescription,
 		owner_id: req.session.user.id
-	}).then(({success, id}) => {
+	}).then(({success, id, path}) => {
 		if(success) {
 			let podcastID = id
 			let rssFeedID = rssStore.getFeedID(req.session.user.id).then((rssFeedID) => {
 				rssStore.saveRssMessageToDB(req, res, {
 						episodeName: req.body.episodeName,
 						description: req.body.episodeDescription,
-						path: '/',
+						path: path,
 						owner_id: req.session.user.id,
 						rssfeed_id: rssFeedID,
 						podcast_id: podcastID
@@ -85,8 +87,8 @@ router.post('/uploadPodcast', (req, res, next) => {
 			)})	
 			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
-		else res.sendStatus(401)
+		else res.sendStatus(400)
 	})
 })
 
-module.exports = router;
+module.exports = router

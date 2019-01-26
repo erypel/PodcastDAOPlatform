@@ -7,4 +7,11 @@ function randomString(){
 	return crypto.randomBytes(4).toString('hex')
 }
 
-module.exports = {randomString}
+function getPathToFileStore(){
+	return 'C:/Users/Evan/workspace/PodcastDAOPlatform/uploads/'
+}
+
+module.exports = {
+		randomString,
+		getPathToFileStore
+	}
