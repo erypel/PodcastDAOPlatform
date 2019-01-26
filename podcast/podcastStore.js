@@ -5,15 +5,36 @@ const knex = require('knex')(require('../knexfile'))
 const fs = require('fs'); //use the file system so we can save files
 const rss = require('../rss/rss')
 
-//TODO this can be better
-function constructPathToPodcastOnFileStore(episodeName){
-	return "C:/Users/Evan/workspace/PodcastDAOPlatform/uploads/" + episodeName
+function constructPathToPodcastOnFileStore(userID){
+	// each user will have a folder in the filestore to store their files
+	return getPathToFileStore() + userID + '/' 
 }
 
-function saveFileToFileStore(file){
-	let bufDataFile = new Buffer(file.data, "utf-8"); //TODO deprecated
+function getPathToFileStore(){
+	return 'C:/Users/Evan/workspace/PodcastDAOPlatform/uploads/'
+}
+
+function createFileName(episodeName, mimetype){
+	let extension = '.error'
+	if(mimetype === 'audio/wav')
+		extension = '.wav'
+	else if(mimetype === 'audio/mp3')
+		extension = '.mp3'
+	return episodeName + extension
+}
+
+function saveFileToFileStore(file, userID, episodeName){
+	let bufDataFile = Buffer.from(file.data, "utf-8");
+	let target_path = constructPathToPodcastOnFileStore(userID)
 	
-	let target_path = constructPathToPodcastOnFileStore(file.name)
+	// create the directory if it doesn't exist
+	fs.mkdir(target_path, function(err){
+		if(!err || err && err.code === 'EEXIST') {} //ignore, directory exists alread
+		else console.log(err)
+	})
+	// append file name to path
+	target_path += createFileName(episodeName, file.mimetype)
+	
 	fs.writeFile(target_path, bufDataFile,  function(err) {
       if (err) {
          return console.error(err);
@@ -32,9 +53,9 @@ function uploadPodcast(req, res){
 			console.log("File not found");
 			return;
 		}
-	
+	console.log(req)
 	file = req.files.fileUpload
-	return saveFileToFileStore(file)
+	return saveFileToFileStore(file, req.user.id, req.body.episodeName)
 }
 
 function getAllPodcasts(callback){

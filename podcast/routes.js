@@ -25,21 +25,20 @@ router.get('/podcast', session.requireLogin, (req, res) => {
 	})
 })
 
-// define a route music it creates readstream to the requested 
+// creates readstream to the requested 
 // file and pipes the output to response
 router.get('/play', function(req, res) {
 	//TODO definitely don't want to be passing the path around like this.
 	//TODO fix in the future. maybe save path segment in db instead of whole path
-	let path = req.query.path;
+	let path = req.query.path
 	console.log("file: " + path)
 	fs.exists(path, function(exists){
 		if(exists){
-			let rstream = fs.createReadStream(path);
-			rstream.pipe(res);
+			let rstream = fs.createReadStream(path)
+			rstream.pipe(res)
 		}
 		else {
-			res.send('404')
-			res.end()
+			res.sendStatus(400)
 		}
 	})
 })
@@ -54,13 +53,12 @@ router.get('/download', (req, res) => {
 		{
 			res.setHeader('Content-disposition', 'attachment; filename=' + fileId);
 			res.setHeader('Content-Type', 'application/audio/mpeg3')
-			var rstream = fs.createReadStream(file);
-			rstream.pipe(res);
+			var rstream = fs.createReadStream(file)
+			rstream.pipe(res)
 		}
 		else
 		{
-			res.send("404");
-			res.end();
+			res.sendStatus(400)
 		}
 	});
 })
@@ -85,8 +83,8 @@ router.post('/uploadPodcast', (req, res, next) => {
 			)})	
 			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
-		else res.sendStatus(401)
+		else res.sendStatus(400)
 	})
 })
 
-module.exports = router;
+module.exports = router
