@@ -9,6 +9,7 @@ const podcastStore = require('./podcastStore')
 const rssStore = require('../rss/rssStore')
 const session = require('../authentication/session')
 const fs = require('fs')
+const utils = require('../utils/utils')
 
 router.use(fileupload())
 router.use(bodyParser.json())
@@ -25,12 +26,15 @@ router.get('/podcast', session.requireLogin, (req, res) => {
 	})
 })
 
-// creates readstream to the requested 
-// file and pipes the output to response
+/**
+ * creates readstream to the requested file and pipes the output to response
+ * 
+ * @param req
+ * @param res
+ * @returns
+ */ 
 router.get('/play', function(req, res) {
-	//TODO definitely don't want to be passing the path around like this.
-	//TODO fix in the future. maybe save path segment in db instead of whole path
-	let path = req.query.path
+	let path = utils.getPathToFileStore() + req.query.path
 	console.log("file: " + path)
 	fs.exists(path, function(exists){
 		if(exists){
@@ -68,14 +72,14 @@ router.post('/uploadPodcast', (req, res, next) => {
 		episode_name: req.body.episodeName, 
 		description: req.body.episodeDescription,
 		owner_id: req.session.user.id
-	}).then(({success, id}) => {
+	}).then(({success, id, path}) => {
 		if(success) {
 			let podcastID = id
 			let rssFeedID = rssStore.getFeedID(req.session.user.id).then((rssFeedID) => {
 				rssStore.saveRssMessageToDB(req, res, {
 						episodeName: req.body.episodeName,
 						description: req.body.episodeDescription,
-						path: '/',
+						path: path,
 						owner_id: req.session.user.id,
 						rssfeed_id: rssFeedID,
 						podcast_id: podcastID
