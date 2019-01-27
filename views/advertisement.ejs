@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Advertisement Store</title>
+</head>
+<body>
+	<div id="tableDiv">
+		<h2>Advertisements</h2>
+		<table border="1">
+			<tr>
+				<th>Advertisement</th><th>Description</th><th>Listen</th>
+			</tr>
+			<% ads.forEach(function(ad) { console.log(ad)%>
+				<tr>
+					<td><%=ad.ad_name%></td>
+					<td><%=ad.description%></td>
+					<td><a href="http://localhost:3000/play?path=<%=ad.path%>"><button>Play</button></a></td>
+				</tr>
+			<% }) %>
+		</table>
+	</div>
+	<br>
+	<form action="/dashboard" method = "get">
+          <button>Back</button>
+    </form> 
+	<form action="/logout" method = "get">
+          <button>Logout</button>
+    </form>
+</body>
+</html>
