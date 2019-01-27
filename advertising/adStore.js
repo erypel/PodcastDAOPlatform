@@ -5,6 +5,9 @@ const knex = require('knex')(require('../knexfile'))
 const fs = require('fs'); //use the file system so we can save files
 const utils = require('../utils/utils')
 
+//TODO a lot of this can probably be consolidate with functionality for podcast uploads
+//TODO delete ad records and files when their escrow runs out
+
 function constructPathToPodcastOnFileStore(userID){
 	// each user will have a folder in the filestore to store their files
 	return 'advertisements/' + userID + '/' 
