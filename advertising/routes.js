@@ -15,6 +15,14 @@ router.get('/uploadAd', session.requireLogin, (req, res) => {
 	res.render('uploadAd')
 })
 
+router.get('/advertisement', session.requireLogin, (req, res) => {
+	adStore.getAllAds(function(ads){
+		res.render('advertisement', {
+			ads: ads
+		})
+	})
+})
+
 router.post('/uploadAdFile', (req, res) => {
 	adStore.saveAdToDB(req, res, {
 		ad_name: req.body.adName, 

@@ -72,6 +72,27 @@ function saveAdToDB(req, res, {ad_name, description, owner_id}) {
       })
 }
 
+function getAllAds(callback){
+	selectAllAds(function(ads){
+		callback(ads);
+	})
+}
+
+/**
+ * makes call to the DB to retrieve the ads
+ * @returns
+ */
+function selectAllAds(callback){
+	let ads = []
+	knex.select().table('advertisement').then(function(rowDataPacket){
+		rowDataPacket.forEach(function(ad){
+			ads.push(ad)
+		})
+		callback(ads)
+	})
+}
+
 module.exports = {
-	saveAdToDB
+	saveAdToDB,
+	getAllAds
 }
