@@ -6,12 +6,26 @@ const router = express.Router()
 const bodyParser = require('body-parser')
 const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 const session = require('../authentication/session')
+const adStore = require('./adStore')
 const fs = require('fs')
 
 router.use(bodyParser.json())
 
 router.get('/uploadAd', session.requireLogin, (req, res) => {
 	res.render('uploadAd')
+})
+
+router.post('/uploadAdFile', (req, res) => {
+	adStore.saveAdToDB(req, res, {
+		ad_name: req.body.adName, 
+		description: req.body.adDescription, 
+		owner_id: req.session.user.id
+	}).then(({success, id, path}) => {
+		if(success) {
+			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+		}
+		else res.sendStatus(400)
+	})
 })
 
 module.exports = router
