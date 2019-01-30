@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Select Podcast</title>
+</head>
+<body>
+	<div id="tableDiv">
+		<h2>Podcasts</h2>
+		<table border="1">
+			<tr>
+				<th>Episode</th><th>Description</th><th>Listen</th><th>Select</th>
+			</tr>
+			<% podcasts.forEach(function(podcast) { %>
+				<tr>
+					<td><%=podcast.episode_name%></td>
+					<td><%=podcast.description%></td>
+					<td><a href="http://localhost:3000/play?path=<%=podcast.path%>"><button>Play</button></a></td>
+					<td>
+						<form action="selectPodcast" method="post">
+							<input type="hidden" name="advertisementID" value=<%=advertisementID %> />
+							<input type="hidden" name="podcastID" value=<%= podcast.id%> />
+							<input type="submit" value="Select"/>
+						</form>
+					</td>
+
+				</tr>
+			<% }) %>
+		</table>
+	</div>
+	<br>
+	<form action="/dashboard" method = "get">
+          <button>Back</button>
+    </form> 
+	<form action="/logout" method = "get">
+          <button>Logout</button>
+    </form>
+</body>
+</html>

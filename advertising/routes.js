@@ -24,12 +24,27 @@ router.get('/getAddStore', session.requireLogin, (req, res) => {
 	})
 })
 
+router.post('/selectPodcast', session.requireLogin, (req, res) => {
+	console.log(req.body)
+	let advertisementID = req.body.advertisementID
+	let podcastID = req.body.podcastID
+	adStore.linkAdToPodcast(advertisementID, podcastID).then(({success, id, path}) => {
+		if(success) {
+			res.send('Linked!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+		}
+		else res.sendStatus(400)
+	})
+})
+
 router.post('/selectAd', session.requireLogin, (req, res) => {
 	let advertisementID = req.body.id
 	console.log(advertisementID)
 	let userID = req.session.user.id
-	podcastStore.getPodcastsForUserID(userID).then((result) => {
-		console.log("result", result)
+	podcastStore.getPodcastsForUserID(userID).then((podcasts) => {
+		res.render('selectPodcast', {
+			advertisementID: advertisementID,
+			podcasts: podcasts
+		})
 	})
 	
 })

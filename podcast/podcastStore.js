@@ -87,11 +87,9 @@ function getPodcastsForUserID(userID){
 		let podcasts = []
 		return knex.select().table('podcast').where({owner_id: userID}).then(function(rowDataPacket){
 			rowDataPacket.forEach(function(podcast){
-				console.log("pushing", podcast)
 				podcasts.push(podcast)
 			})
 		}).then(()=> {
-			console.log('returning', podcasts)
 			resolve(podcasts)
 		})
 	})
