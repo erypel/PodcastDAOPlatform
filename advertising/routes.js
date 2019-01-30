@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 const session = require('../authentication/session')
 const adStore = require('./adStore')
+const podcastStore = require('../podcast/podcastStore')
 const fs = require('fs')
 
 router.use(bodyParser.json())
@@ -15,12 +16,37 @@ router.get('/uploadAd', session.requireLogin, (req, res) => {
 	res.render('uploadAd')
 })
 
-router.get('/advertisement', session.requireLogin, (req, res) => {
+router.get('/getAddStore', session.requireLogin, (req, res) => {
 	adStore.getAllAds(function(ads){
 		res.render('advertisement', {
 			ads: ads
 		})
 	})
+})
+
+router.post('/selectPodcast', session.requireLogin, (req, res) => {
+	console.log(req.body)
+	let advertisementID = req.body.advertisementID
+	let podcastID = req.body.podcastID
+	adStore.linkAdToPodcast(advertisementID, podcastID).then(({success, id, path}) => {
+		if(success) {
+			res.send('Linked!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+		}
+		else res.sendStatus(400)
+	})
+})
+
+router.post('/selectAd', session.requireLogin, (req, res) => {
+	let advertisementID = req.body.id
+	console.log(advertisementID)
+	let userID = req.session.user.id
+	podcastStore.getPodcastsForUserID(userID).then((podcasts) => {
+		res.render('selectPodcast', {
+			advertisementID: advertisementID,
+			podcasts: podcasts
+		})
+	})
+	
 })
 
 router.post('/uploadAdFile', (req, res) => {

@@ -9,13 +9,14 @@
 		<h2>Advertisements</h2>
 		<table border="1">
 			<tr>
-				<th>Advertisement</th><th>Description</th><th>Listen</th>
+				<th>Advertisement</th><th>Description</th><th>Listen</th><th>Select</th>
 			</tr>
 			<% ads.forEach(function(ad) { console.log(ad)%>
 				<tr>
 					<td><%=ad.ad_name%></td>
 					<td><%=ad.description%></td>
 					<td><a href="http://localhost:3000/play?path=<%=ad.path%>"><button>Play</button></a></td>
+					<td><form action="selectAd" method="post"><button name="id" value=<%=ad.id%> >Select</button></form></td>
 				</tr>
 			<% }) %>
 		</table>

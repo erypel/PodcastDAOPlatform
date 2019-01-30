@@ -95,7 +95,27 @@ function selectAllAds(callback){
 	})
 }
 
+function linkAdToPodcast(adID, podcastID){
+	return knex('adlink').insert({
+		ad_ID: adID,
+		podcast_ID: podcastID
+	}, 'id').then((result) => {
+        return { success: true, id: result[0] }
+    })
+}
+
+function getLinkedAdID(podcastID){
+	return knex('adlink').select('ad_ID').where({podcast_ID: podcastID})
+}
+
+function selectAdByID(adID){
+	return knex('advertisement').select().where({id: adID})
+}
+
 module.exports = {
 	saveAdToDB,
-	getAllAds
+	getAllAds,
+	linkAdToPodcast,
+	getLinkedAdID,
+	selectAdByID
 }

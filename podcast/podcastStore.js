@@ -82,6 +82,19 @@ function selectAllPodcasts(callback){
 	})
 }
 
+function getPodcastsForUserID(userID){
+	return new Promise(function(resolve, reject) {
+		let podcasts = []
+		return knex.select().table('podcast').where({owner_id: userID}).then(function(rowDataPacket){
+			rowDataPacket.forEach(function(podcast){
+				podcasts.push(podcast)
+			})
+		}).then(()=> {
+			resolve(podcasts)
+		})
+	})
+}
+
 function appendToRSS(podcast){
 	rss.appendToRSS(podcast)
 }
@@ -108,5 +121,6 @@ module.exports = {
 	savePodcastToDB,
 	uploadPodcast,
 	getAllPodcasts,
+	getPodcastsForUserID,
 	getUploaderID
 }
