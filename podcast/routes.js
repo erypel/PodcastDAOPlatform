@@ -7,6 +7,7 @@ const bodyParser = require('body-parser')
 const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 const podcastStore = require('./podcastStore')
 const rssStore = require('../rss/rssStore')
+const adStore = require('../advertising/adStore')
 const session = require('../authentication/session')
 const fs = require('fs')
 const utils = require('../utils/utils')
@@ -34,6 +35,18 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  * @returns
  */ 
 router.get('/play', function(req, res) {
+	let podcastID = req.query.id
+	console.log(req.query)
+	//TODO avoid getting super nested
+	let ad_ID = adStore.getLinkedAdID(podcastID).then(result => {
+		console.log("adID", result)
+		if(result){
+			let ad = adStore.selectAdByID(result[0].ad_ID).then(ad => {
+				console.log('ad', ad[0])
+			//TODO link ad audio with podcast audio. will probably need a special library
+			})
+		}
+	})
 	let path = utils.getPathToFileStore() + req.query.path
 	console.log("file: " + path)
 	fs.exists(path, function(exists){
