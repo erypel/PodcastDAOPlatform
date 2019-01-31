@@ -112,10 +112,16 @@ function selectAdByID(adID){
 	return knex('advertisement').select().where({id: adID})
 }
 
+//TODO this should eventually become something based off of an organization ID
+function selectAdsByUserID(userID){
+	return knex('advertisement').select().where({owner_id: userID})
+}
+
 module.exports = {
 	saveAdToDB,
 	getAllAds,
 	linkAdToPodcast,
 	getLinkedAdID,
-	selectAdByID
+	selectAdByID,
+	selectAdsByUserID
 }
