@@ -35,7 +35,9 @@
 				<td>Advertisement: </td>
 				<td>
 					<select name="ads">
-    					<option value="TODO">Fill Dynamically</option>
+						<% ads.forEach(function(ad){ %>
+							<option value=<%=ad.id %>><%=ad.name %></option>
+						<% }) %>	
   					</select>
   				</td>
 			</tr>
