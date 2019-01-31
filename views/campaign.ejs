@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Create Advertising Campaign</title>
+</head>
+<body>
+	<form action="/createCampaign" method="post" enctype="multipart/form-data">
+		<table border="0">
+			<tr>
+				<td>Title: </td>
+				<td><input type="text" name="title" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Description: </td>
+				<td><input type="text" name="description" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Budget: </td>
+				<td><input type="text" name="budget" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Price per listen: </td>
+				<td><input type="text" name="price" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Allow cancel after: </td>
+				<td><input type="text" name="cancel_date" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Execute after: </td>
+				<td><input type="text" name="start_date" size="50"/></td>
+			</tr>
+			<tr>
+				<td>Advertisement: </td>
+				<td>
+					<select name="ads">
+    					<option value="TODO">Fill Dynamically</option>
+  					</select>
+  				</td>
+			</tr>
+			<tr>
+            	<td colspan="2">
+            		<input type="submit" value="Create">
+                </td>
+            </tr>
+		</table>
+	</form>
+	<br>
+	<form action="/dashboard" method = "get">
+          <button>Back</button>
+    </form> 
+	<form action="/logout" method = "get">
+          <button>Logout</button>
+    </form>
+</body>
+</html>
