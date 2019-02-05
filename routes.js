@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 const userStore = require('./authentication/store')
 const requireLogin = require('./authentication/session').requireLogin
 const utils = require('./utils/utils')
+const constants = require('./constants')
 
 router.use(express.static('authentication'))
 router.use(bodyParser.json())
@@ -54,9 +55,18 @@ router.get('/', function(req, res) {
 	res.render("login")
 })
 
+//TODO there is probably a more secure way to do this
 router.get('/dashboard', requireLogin, function(req, res) {
 	//TODO bug where user logs out and can navigate back to dashboard with back button
-	res.render('dashboard')
+	if(req.session.user.profile === constants.CONTENT_CREATOR_USER_PROFILE) {
+		res.render('dashboard')
+	}
+	else if(req.session.user.profile === constants.ADVERTISER_USER_PROFILE) {
+		res.render('advertiserDashboard')
+	}
+	else {
+		res.sendStatus(400)
+	}
 })
 
 module.exports = router;

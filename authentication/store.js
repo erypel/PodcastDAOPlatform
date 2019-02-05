@@ -4,6 +4,7 @@
 const crypto = require('crypto')
 const knex = require('knex')(require('../knexfile'))
 const utils = require('../utils/utils')
+const constants = require('../constants')
 
 // BEGIN UTILITY FUNCTIONS
 
@@ -171,7 +172,24 @@ function createUser ({username, email, password}) {
 		 username,
 		 email,
 		 salt,
-		 encrypted_password: hash
+		 encrypted_password: hash,
+		 profile: constants.CONTENT_CREATOR_USER_PROFILE // only CONTENT_CREATORs should be created here. There is a special way to create an advertiser account
+	 }, 'id') // returns id in order to generate wallet
+}
+
+// this function is kept separate from createUser in case advertisers and content creators become drastically different (which is very possible)
+function createAdvertiser({username, email, password}) {
+	// As per OWASP recommendations, User IDs should be case insensitive, so
+	// we'll store them in lower case
+	 username = username.toLowerCase()
+	 console.log(`Add user ${username}`)
+	 const {salt, hash} = saltHashPassword({password})
+	 return knex('user').insert({
+		 username,
+		 email,
+		 salt,
+		 encrypted_password: hash,
+		 profile: constants.ADVERTISER_USER_PROFILE // only CONTENT_CREATORs should be created here. There is a special way to create an advertiser account
 	 }, 'id') // returns id in order to generate wallet
 }
 
@@ -194,6 +212,7 @@ module.exports = {
 		validatePassword,
 		saltHashPassword,
 		createUser,
+		createAdvertiser,
 		authenticate,
 		getUser,
 		getUserID
