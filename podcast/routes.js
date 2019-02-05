@@ -11,6 +11,7 @@ const adStore = require('../advertising/adStore')
 const session = require('../authentication/session')
 const fs = require('fs')
 const utils = require('../utils/utils')
+const campaignStore = require('../advertising/adcampaign/campaignStore')
 
 router.use(fileupload())
 router.use(bodyParser.json())
@@ -45,14 +46,27 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  */ 
 router.get('/play', function(req, res) {
 	let podcastID = req.query.id
-	console.log(req.query)
+	
 	//TODO avoid getting super nested
+	// check if there is a linked ad
 	let ad_ID = adStore.getLinkedAdID(podcastID).then(result => {
 		console.log("adID", result)
-		if(result){
+		if(result && result != []){
+			// TODO there should only be one linked ad allowed. I'm sure the logic for
+			// that isn't in place yet, but for now we will assume it is and will 
+			// compensate but just using the first row returned
 			let ad = adStore.selectAdByID(result[0].ad_ID).then(ad => {
 				console.log('ad', ad[0])
+				//check to make sure that there are still funds held in escrow.
+				// TODO this will get tricky and we will want to place locks 
+				// on funds to avoid multi-thread/concurrency issues
+				campaignStore.getAdCampaignForAd(ad[0].id).then(campaign => {
+					// TODO There should only be one campaign per ad. There is no logic to check for
+					// this yet, so we just use the first row returned
+					console.log('campaign', campaign[0])
+				})
 			//TODO link ad audio with podcast audio. will probably need a special library
+			//TODO for now, both audio files are just played consecutively
 			})
 		}
 	})

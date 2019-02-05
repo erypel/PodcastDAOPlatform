@@ -19,4 +19,17 @@ function insertAdCampaign(campaign, userID){
       })
 
 }
-module.exports = {insertAdCampaign}
+
+function selectAllAdCampaigns(){
+	return knex('adcampaign')
+}
+
+function getAdCampaignForAd(adID){
+	return knex('adcampaign').where({ad_id: adID})
+}
+
+module.exports = {
+		insertAdCampaign,
+		getAdCampaignForAd,
+		selectAllAdCampaigns
+	}

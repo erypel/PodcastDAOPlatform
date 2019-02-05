@@ -75,6 +75,16 @@ function saveAdToDB(req, res, {ad_name, description, owner_id}) {
       })
 }
 
+/**
+ * 
+ * This may be deprecated or may be incorporated somewhere else.
+ * It was initially used to mock up ad linkages, but those should
+ * now be based on ad campaigns
+ * 
+ * @deprecated 
+ * @param callback
+ * @returns
+ */
 function getAllAds(callback){
 	selectAllAds(function(ads){
 		callback(ads);
@@ -117,11 +127,16 @@ function selectAdsByUserID(userID){
 	return knex('advertisement').select().where({owner_id: userID})
 }
 
+function selectAdsWhereInByID(arrayOfAdIDs){
+	return knex('advertisement').select().whereIn('id', arrayOfAdIDs)
+}
+
 module.exports = {
 	saveAdToDB,
 	getAllAds,
 	linkAdToPodcast,
 	getLinkedAdID,
 	selectAdByID,
-	selectAdsByUserID
+	selectAdsByUserID,
+	selectAdsWhereInByID
 }
