@@ -12,7 +12,7 @@ const session = require('../authentication/session')
 const fs = require('fs')
 const utils = require('../utils/utils')
 const campaignStore = require('../advertising/adcampaign/campaignStore')
-
+const walletStore = require('../wallet/walletStore')
 router.use(fileupload())
 router.use(bodyParser.json())
 
@@ -32,8 +32,8 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  * Basic Flow for playing podcasts (subject to change):
  * 1) check if there is a linked advertisement
  * 		a) if there is a linked ad and there are still funds in escrow, play the ad
- * 		b) after playing the ad, credit the content creator
- * 		c) after playing the ad, debit the advertiser
+ * 		b) after playing the ad, debit the advertiser
+ * 		c) after playing the ad, credit the content creator
  * 		d) if the escrow contract is now out, unlink the ad and remove db connections
  * 2) play the podcast
  */
@@ -63,22 +63,102 @@ router.get('/play', function(req, res) {
 				campaignStore.getAdCampaignForAd(ad[0].id).then(campaign => {
 					// TODO There should only be one campaign per ad. There is no logic to check for
 					// this yet, so we just use the first row returned
-					console.log('campaign', campaign[0])
+					if(!campaign[0] || campaign === [] ){
+						return
+					}
+					else{
+						console.log('campaign', campaign[0])
+						let pricePerView = campaign[0].pay_per_view
+						if(Number(campaign[0].curr_amount) - Number(pricePerView) < 0.000000){
+							//there's no need to update an advertiser's wallet if they still have some dust
+							//in their escrow record since their personal wallet should not have been deducted
+							//that dust
+							
+							//remove the ad campaign. there's no money left!
+							campaignStore.deleteCampaign(campaign[0].id)
+							//also unlink the ad from this podcast
+							adStore.removeLink(podcastID, ad[0].id)
+						}
+						else{
+							//TODO this will have to be revamped with a 'playlist' of sorts and will be easier
+							// to implement after finalizing audio playing, which will now be the next step
+							console.log('the escrow has sufficient funds')
+							//play the ad
+							let adPath = utils.getPathToFileStore() + ad[0].path
+							console.log('ad path', adPath)
+							fs.exists(adPath, function(exists){
+								if(exists){
+									let rstream = fs.createReadStream(adPath)
+									rstream.on('error', function(err){
+										console.log('error!!', err)
+									})
+									//TODO this doesn't work, but will be made functional upon implementing
+									// an audio player
+									rstream.on('finish', function(){
+										console.log("finished!!!!!!")
+										//TODO if any of these fail, they should all be rolled back
+										//once the ad has finished playing, debit the advertiser and escrow/campaign record
+										let updatedCampaignBalance = Number(campaign[0].curr_amount) - Number(pricePerView)
+										campaignStore.updateCurrAmount(campaign[0].id, updatedCampaignBalance)
+										let advertiserWalletBalance = walletStore.getUserBalance(ad[0].owner_id)
+										let updatedAdvertiserBalance = Number(advertiserWalletBalance) - Number(pricePerView)
+										walletStore.updateUserBalance(ad[0].owner_id, updatedAdvertiserBalance)
+						
+										//credit the content creator
+										let contentCreatorWalletBalance = walletStore.getUserBalance(req.query.owner_id)
+										let contentCreatorUpdatedBalance = Number(contentCreatorWalletBalance) + Number(payPerView)
+										walletStore.updateUserBalance(req.query.owner_id, contentCreatorUpdatedBalance)
+										
+										//check if there are still sufficient funds in escrow
+										campaignStore.getAdCampaignForAd(ad[0].id).then(campaign => {
+											// TODO There should only be one campaign per ad. There is no logic to check for
+											// this yet, so we just use the first row returned
+											if(!campaign[0] || campaign === [] ){
+												return
+											}
+											else{
+												console.log('campaign', campaign[0])
+												let pricePerView = campaign[0].pay_per_view
+												//if not, remove the campaign and unlink the ad
+												if(Number(campaign[0].curr_amount) - Number(pricePerView) < 0.000000){
+													//there's no need to update an advertiser's wallet if they still have some dust
+													//in their escrow record since their personal wallet should not have been deducted
+													//that dust
+							
+													//remove the ad campaign. there's no money left!
+													campaignStore.deleteCampaign(campaign[0].id)
+													//also unlink the ad from this podcast
+													adStore.removeLink(podcastID, ad[0].id)
+												}
+											}
+										})
+										
+										//play the podcast
+										let podcastPath = utils.getPathToFileStore() + req.query.path
+										console.log("file: " + podcastPath)
+										fs.exists(podcastPath, function(exists){
+											if(exists){
+												let podcastStream = fs.createReadStream(podcastPath)
+												podcastStream.pipe(res)
+											}
+											else {
+												res.sendStatus(400)
+											}
+										})
+									})
+									rstream.pipe(res)
+								}
+								else {
+									console.log('error playing advertisement')
+									res.sendStatus(400)
+								}
+							})
+						}
+					}
 				})
 			//TODO link ad audio with podcast audio. will probably need a special library
 			//TODO for now, both audio files are just played consecutively
 			})
-		}
-	})
-	let path = utils.getPathToFileStore() + req.query.path
-	console.log("file: " + path)
-	fs.exists(path, function(exists){
-		if(exists){
-			let rstream = fs.createReadStream(path)
-			rstream.pipe(res)
-		}
-		else {
-			res.sendStatus(400)
 		}
 	})
 })

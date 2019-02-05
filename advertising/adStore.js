@@ -118,6 +118,10 @@ function getLinkedAdID(podcastID){
 	return knex('adlink').select('ad_ID').where({podcast_ID: podcastID})
 }
 
+function removeLink(podcastID, adID){
+	return knex('adlink').where({ad_id: adID, podcast_id: podcastID}).del()
+}
+
 function selectAdByID(adID){
 	return knex('advertisement').select().where({id: adID})
 }
@@ -138,5 +142,6 @@ module.exports = {
 	getLinkedAdID,
 	selectAdByID,
 	selectAdsByUserID,
-	selectAdsWhereInByID
+	selectAdsWhereInByID,
+	removeLink
 }
