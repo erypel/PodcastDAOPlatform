@@ -27,6 +27,15 @@ router.get('/podcast', session.requireLogin, (req, res) => {
 	})
 })
 
+/*
+ * Basic Flow for playing podcasts (subject to change):
+ * 1) check if there is a linked advertisement
+ * 		a) if there is a linked ad and there are still funds in escrow, play the ad
+ * 		b) after playing the ad, credit the content creator
+ * 		c) after playing the ad, debit the advertiser
+ * 		d) if the escrow contract is now out, unlink the ad and remove db connections
+ * 2) play the podcast
+ */
 /**
  * creates readstream to the requested file and pipes the output to response
  * 
