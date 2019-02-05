@@ -177,6 +177,22 @@ function createUser ({username, email, password}) {
 	 }, 'id') // returns id in order to generate wallet
 }
 
+// this function is kept separate from createUser in case advertisers and content creators become drastically different (which is very possible)
+function createAdvertiser({username, email, password}) {
+	// As per OWASP recommendations, User IDs should be case insensitive, so
+	// we'll store them in lower case
+	 username = username.toLowerCase()
+	 console.log(`Add user ${username}`)
+	 const {salt, hash} = saltHashPassword({password})
+	 return knex('user').insert({
+		 username,
+		 email,
+		 salt,
+		 encrypted_password: hash,
+		 profile: constants.ADVERTISER_USER_PROFILE // only CONTENT_CREATORs should be created here. There is a special way to create an advertiser account
+	 }, 'id') // returns id in order to generate wallet
+}
+
 function getUser(username){
 	  username = username.toLowerCase() // username should be lower case in the
 										// DB
@@ -196,6 +212,7 @@ module.exports = {
 		validatePassword,
 		saltHashPassword,
 		createUser,
+		createAdvertiser,
 		authenticate,
 		getUser,
 		getUserID
