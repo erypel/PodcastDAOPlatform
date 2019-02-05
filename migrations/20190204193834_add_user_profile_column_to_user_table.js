@@ -1,7 +1,8 @@
+const constants = require('../constants')
 
 exports.up = function(knex, Promise) {
 	 return knex.schema.alterTable('user', function(table){
-		  table.string('profile') //TODO this should ideally have a check constraint, but MySQL doesn't support those and neither does knex
+		  table.string('profile').defaultTo(constants.CONTENT_CREATOR_USER_PROFILE) //TODO this should ideally have a check constraint, but MySQL doesn't support those and neither does knex
 	  })
 };
 
