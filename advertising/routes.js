@@ -8,6 +8,7 @@ const fileupload = require("express-fileupload"); //TODO too slow for large file
 const session = require('../authentication/session')
 const adStore = require('./adStore')
 const podcastStore = require('../podcast/podcastStore')
+const campaignStore = require('./adcampaign/campaignStore')
 const fs = require('fs')
 
 router.use(bodyParser.json())
@@ -16,10 +17,22 @@ router.get('/uploadAd', session.requireLogin, (req, res) => {
 	res.render('uploadAd')
 })
 
-router.get('/getAddStore', session.requireLogin, (req, res) => {
-	adStore.getAllAds(function(ads){
-		res.render('advertisement', {
-			ads: ads
+router.get('/getAdCampaignStore', session.requireLogin, (req, res) => {
+	campaignStore.selectAllAdCampaigns().then(campaigns => {
+		adIDs = []
+		console.log('campaigns', campaigns)
+		// get all of the ad ids
+		campaigns.forEach(function(campaign){
+			adIDs.push(campaign.ad_id)
+			// once we have processed all the campaigns, get all the ads
+			if(adIDs.length === campaigns.length) {
+				console.log('done fetching ad ids')
+				adStore.selectAdsWhereInByID(adIDs).then(ads => {
+					res.render('advertisement', {
+						ads: ads
+					})
+				})
+			}
 		})
 	})
 })
