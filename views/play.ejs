@@ -14,7 +14,7 @@
   </button>
 </p>
 	<br>
-	<form action="/dashboard" method = "get">
+	<form action="/podcast" method = "get">
           <button>Back</button>
     </form> 
 	<form action="/logout" method = "get">
@@ -26,8 +26,12 @@
 	    waveColor: 'violet',
 	    progressColor: 'purple'
 	})
+	let a = "<%=url.userID%>"
+	let b = "<%=url.name%>"
+	let c = "<%=url.type%>"
 	//need to run `http-server --cors` for access to file server
-	wavesurfer.load("http://localhost:8080/uploads/testmp3.mp3")
+	if(a) wavesurfer.load("uploads/" + a + '/' + b + '.' + c)
+	else wavesurfer.load("uploads/" + b + '.' + c)
 	wavesurfer.on('ready', function () {
 		wavesurfer.play();
 	})

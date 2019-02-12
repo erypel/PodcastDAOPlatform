@@ -6,6 +6,9 @@ const express = require('express')
 const app = express()
 app.set('view engine', 'ejs');
 
+//Static audio files
+app.use('/uploads', express.static(__dirname + '/uploads'));
+
 //Routes
 app.use(require('./routes'))
 app.use(require('./authentication/routes'))
