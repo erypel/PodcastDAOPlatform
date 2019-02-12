@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Play</title>
+</head>
+<body>
+	<script src="https://unpkg.com/wavesurfer.js"></script>
+	<div id="waveform"></div>
+	<p align="center">
+  <button class="btn btn-primary" onclick="wavesurfer.playPause()">
+    <i class="glyphicon glyphicon-play"></i>
+    Play
+  </button>
+</p>
+	<br>
+	<form action="/dashboard" method = "get">
+          <button>Back</button>
+    </form> 
+	<form action="/logout" method = "get">
+          <button>Logout</button>
+    </form>
+    <script type="text/javascript">
+    let wavesurfer = WaveSurfer.create({
+	    container: '#waveform',
+	    waveColor: 'violet',
+	    progressColor: 'purple'
+	})
+	//need to run `http-server --cors` for access to file server
+	wavesurfer.load("http://localhost:8080/uploads/testmp3.mp3")
+	wavesurfer.on('ready', function () {
+		wavesurfer.play();
+	})
+	
+    </script>
+</body>
+</html>

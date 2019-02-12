@@ -8,7 +8,7 @@ function randomString(){
 }
 
 function getPathToFileStore(){
-	return 'C:/Users/Evan/workspace/PodcastDAOPlatform/uploads/'
+	return 'http:/localhost:8080/uploads'
 }
 
 module.exports = {

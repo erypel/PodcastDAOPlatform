@@ -13,6 +13,7 @@ const fs = require('fs')
 const utils = require('../utils/utils')
 const campaignStore = require('../advertising/adcampaign/campaignStore')
 const walletStore = require('../wallet/walletStore')
+//const WaveSurfer = require('wavesurfer.js');
 router.use(fileupload())
 router.use(bodyParser.json())
 
@@ -45,7 +46,14 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  * @returns
  */ 
 router.get('/play', function(req, res) {
-	let podcastID = req.query.id
+	
+	
+	let podcastPath = req.query.path.substring(1)
+	
+	res.render('play', {
+		path: podcastPath
+	})
+	/*let podcastID = req.query.id
 	
 	//TODO avoid getting super nested
 	// check if there is a linked ad
@@ -160,7 +168,7 @@ router.get('/play', function(req, res) {
 			//TODO for now, both audio files are just played consecutively
 			})
 		}
-	})
+	})*/
 })
 
 //TODO yet to be implemented, but a good start for later
