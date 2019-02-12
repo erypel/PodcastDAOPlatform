@@ -26,12 +26,9 @@
 	    waveColor: 'violet',
 	    progressColor: 'purple'
 	})
-	let a = "<%=url.userID%>"
-	let b = "<%=url.name%>"
-	let c = "<%=url.type%>"
+	let p = "<%=epPath%>"
 	//need to run `http-server --cors` for access to file server
-	if(a) wavesurfer.load("uploads/" + a + '/' + b + '.' + c)
-	else wavesurfer.load("uploads/" + b + '.' + c)
+	wavesurfer.load("uploads/" + p)
 	wavesurfer.on('ready', function () {
 		wavesurfer.play();
 	})

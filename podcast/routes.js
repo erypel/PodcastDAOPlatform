@@ -46,17 +46,8 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  * @returns
  */ 
 router.get('/play', function(req, res) {
-	
-	let url = req.query.path.split('.') //TODO we're assuming a basic file path xxx/xxx.mp3. need to account for trickery
-	let type = url[1]
-	let podcastPath = url[0].split('/')
-	
 	res.render('play', {
-		url: {
-			type: type,
-			name: podcastPath[1],
-			userID: podcastPath[0]
-		}
+		epPath: req.query.path
 	})
 	/*let podcastID = req.query.id
 	
