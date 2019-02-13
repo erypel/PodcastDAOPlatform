@@ -46,10 +46,7 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  * @returns
  */ 
 router.get('/play', function(req, res) {
-	res.render('play', {
-		epPath: req.query.path
-	})
-	/*let podcastID = req.query.id
+	let podcastID = req.query.id
 	
 	//TODO avoid getting super nested
 	// check if there is a linked ad
@@ -88,10 +85,13 @@ router.get('/play', function(req, res) {
 							// to implement after finalizing audio playing, which will now be the next step
 							console.log('the escrow has sufficient funds')
 							//play the ad
-							let adPath = utils.getPathToFileStore() + ad[0].path
+							let adPath = ad[0].path
 							console.log('ad path', adPath)
-							fs.exists(adPath, function(exists){
-								if(exists){
+								
+									res.render('play', {
+										adPath: adPath,
+										epPath: req.query.path
+									})/*
 									let rstream = fs.createReadStream(adPath)
 									rstream.on('error', function(err){
 										console.log('error!!', err)
@@ -151,12 +151,7 @@ router.get('/play', function(req, res) {
 										})
 									})
 									rstream.pipe(res)
-								}
-								else {
-									console.log('error playing advertisement')
-									res.sendStatus(400)
-								}
-							})
+								*/
 						}
 					}
 				})
@@ -164,7 +159,7 @@ router.get('/play', function(req, res) {
 			//TODO for now, both audio files are just played consecutively
 			})
 		}
-	})*/
+	})
 })
 
 //TODO yet to be implemented, but a good start for later

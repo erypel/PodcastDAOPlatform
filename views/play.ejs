@@ -26,11 +26,19 @@
 	    waveColor: 'violet',
 	    progressColor: 'purple'
 	})
+	let a = "<%=adPath%>"
 	let p = "<%=epPath%>"
 	//need to run `http-server --cors` for access to file server
-	wavesurfer.load("uploads/" + p)
+	wavesurfer.load("uploads/" + a)
 	wavesurfer.on('ready', function () {
 		wavesurfer.play();
+	})
+	
+	wavesurfer.on('finish', function() {
+		wavesurfer.load("uploads/" + p)
+		wavesurfer.on('ready', function () {
+			wavesurfer.play();
+		})
 	})
 	
     </script>
