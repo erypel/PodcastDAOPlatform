@@ -13,6 +13,7 @@ const fs = require('fs')
 const utils = require('../utils/utils')
 const campaignStore = require('../advertising/adcampaign/campaignStore')
 const walletStore = require('../wallet/walletStore')
+//const WaveSurfer = require('wavesurfer.js');
 router.use(fileupload())
 router.use(bodyParser.json())
 
@@ -51,7 +52,7 @@ router.get('/play', function(req, res) {
 	// check if there is a linked ad
 	let ad_ID = adStore.getLinkedAdID(podcastID).then(result => {
 		console.log("adID", result)
-		if(result && result != []){
+		if(result && result[0]){
 			// TODO there should only be one linked ad allowed. I'm sure the logic for
 			// that isn't in place yet, but for now we will assume it is and will 
 			// compensate but just using the first row returned
@@ -84,10 +85,13 @@ router.get('/play', function(req, res) {
 							// to implement after finalizing audio playing, which will now be the next step
 							console.log('the escrow has sufficient funds')
 							//play the ad
-							let adPath = utils.getPathToFileStore() + ad[0].path
+							let adPath = ad[0].path
 							console.log('ad path', adPath)
-							fs.exists(adPath, function(exists){
-								if(exists){
+								
+									res.render('play', {
+										adPath: adPath,
+										epPath: req.query.path
+									})/*
 									let rstream = fs.createReadStream(adPath)
 									rstream.on('error', function(err){
 										console.log('error!!', err)
@@ -147,17 +151,17 @@ router.get('/play', function(req, res) {
 										})
 									})
 									rstream.pipe(res)
-								}
-								else {
-									console.log('error playing advertisement')
-									res.sendStatus(400)
-								}
-							})
+								*/
 						}
 					}
 				})
 			//TODO link ad audio with podcast audio. will probably need a special library
 			//TODO for now, both audio files are just played consecutively
+			})
+		}else{
+			res.render('play', {
+				adPath: null,
+				epPath: req.query.path
 			})
 		}
 	})
