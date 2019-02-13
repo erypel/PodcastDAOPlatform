@@ -47,7 +47,7 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  */ 
 router.get('/play', function(req, res) {
 	let podcastID = req.query.id
-	
+
 	//TODO avoid getting super nested
 	// check if there is a linked ad
 	let ad_ID = adStore.getLinkedAdID(podcastID).then(result => {
@@ -74,7 +74,7 @@ router.get('/play', function(req, res) {
 							//there's no need to update an advertiser's wallet if they still have some dust
 							//in their escrow record since their personal wallet should not have been deducted
 							//that dust
-							
+
 							//remove the ad campaign. there's no money left!
 							campaignStore.deleteCampaign(campaign[0].id)
 							//also unlink the ad from this podcast
@@ -87,79 +87,17 @@ router.get('/play', function(req, res) {
 							//play the ad
 							let adPath = ad[0].path
 							console.log('ad path', adPath)
-								
-									res.render('play', {
-										adPath: adPath,
-										epPath: req.query.path,
-										campaignID: campaign[0].id,
-										adID: ad[0].id,
-										podcastID: podcastID
-									})/*
-									let rstream = fs.createReadStream(adPath)
-									rstream.on('error', function(err){
-										console.log('error!!', err)
-									})
-									//TODO this doesn't work, but will be made functional upon implementing
-									// an audio player
-									rstream.on('finish', function(){
-										console.log("finished!!!!!!")
-										//TODO if any of these fail, they should all be rolled back
-										//once the ad has finished playing, debit the advertiser and escrow/campaign record
-										let updatedCampaignBalance = Number(campaign[0].curr_amount) - Number(pricePerView)
-										campaignStore.updateCurrAmount(campaign[0].id, updatedCampaignBalance)
-										let advertiserWalletBalance = walletStore.getUserBalance(ad[0].owner_id)
-										let updatedAdvertiserBalance = Number(advertiserWalletBalance) - Number(pricePerView)
-										walletStore.updateUserBalance(ad[0].owner_id, updatedAdvertiserBalance)
-						
-										//credit the content creator
-										let contentCreatorWalletBalance = walletStore.getUserBalance(req.query.owner_id)
-										let contentCreatorUpdatedBalance = Number(contentCreatorWalletBalance) + Number(payPerView)
-										walletStore.updateUserBalance(req.query.owner_id, contentCreatorUpdatedBalance)
-										
-										//check if there are still sufficient funds in escrow
-										campaignStore.getAdCampaignForAd(ad[0].id).then(campaign => {
-											// TODO There should only be one campaign per ad. There is no logic to check for
-											// this yet, so we just use the first row returned
-											if(!campaign[0] || campaign === [] ){
-												return
-											}
-											else{
-												console.log('campaign', campaign[0])
-												let pricePerView = campaign[0].pay_per_view
-												//if not, remove the campaign and unlink the ad
-												if(Number(campaign[0].curr_amount) - Number(pricePerView) < 0.000000){
-													//there's no need to update an advertiser's wallet if they still have some dust
-													//in their escrow record since their personal wallet should not have been deducted
-													//that dust
-							
-													//remove the ad campaign. there's no money left!
-													campaignStore.deleteCampaign(campaign[0].id)
-													//also unlink the ad from this podcast
-													adStore.removeLink(podcastID, ad[0].id)
-												}
-											}
-										})
-										
-										//play the podcast
-										let podcastPath = utils.getPathToFileStore() + req.query.path
-										console.log("file: " + podcastPath)
-										fs.exists(podcastPath, function(exists){
-											if(exists){
-												let podcastStream = fs.createReadStream(podcastPath)
-												podcastStream.pipe(res)
-											}
-											else {
-												res.sendStatus(400)
-											}
-										})
-									})
-									rstream.pipe(res)
-								*/
+
+							res.render('play', {
+								adPath: adPath,
+								epPath: req.query.path,
+								campaignID: campaign[0].id,
+								adID: ad[0].id,
+								podcastID: podcastID
+							})
 						}
 					}
 				})
-			//TODO link ad audio with podcast audio. will probably need a special library
-			//TODO for now, both audio files are just played consecutively
 			})
 		}else{
 			res.render('play', {
@@ -174,7 +112,7 @@ router.get('/play', function(req, res) {
 router.get('/download', (req, res) => {
 	let fileId = req.query.id
 	let file = '../uploads/' + fileId
-	
+
 	fs.exists(file,function(exists){
 		if(exists)
 		{
@@ -200,15 +138,15 @@ router.post('/uploadPodcast', (req, res, next) => {
 			let podcastID = id
 			let rssFeedID = rssStore.getFeedID(req.session.user.id).then((rssFeedID) => {
 				rssStore.saveRssMessageToDB(req, res, {
-						episodeName: req.body.episodeName,
-						description: req.body.episodeDescription,
-						path: path,
-						owner_id: req.session.user.id,
-						rssfeed_id: rssFeedID,
-						podcast_id: podcastID
-					}
-			)})	
-			res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+					episodeName: req.body.episodeName,
+					description: req.body.episodeDescription,
+					path: path,
+					owner_id: req.session.user.id,
+					rssfeed_id: rssFeedID,
+					podcast_id: podcastID
+				}
+				)})	
+				res.send('Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
 		else res.sendStatus(400)
 	})
