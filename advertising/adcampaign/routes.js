@@ -47,4 +47,8 @@ router.post('/createCampaign', session.requireLogin, (req, res) => {
 	})
 })
 
+router.post('/payAuthor', session.requireLogin, (req, res) => {
+	console.log(req.body)
+})
+
 module.exports = router

@@ -90,7 +90,10 @@ router.get('/play', function(req, res) {
 								
 									res.render('play', {
 										adPath: adPath,
-										epPath: req.query.path
+										epPath: req.query.path,
+										campaignID: campaign[0].id,
+										adID: ad[0].id,
+										contentCreatorID: req.query.owner_id
 									})/*
 									let rstream = fs.createReadStream(adPath)
 									rstream.on('error', function(err){
