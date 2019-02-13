@@ -28,18 +28,27 @@
 	})
 	let a = "<%=adPath%>"
 	let p = "<%=epPath%>"
+	let autoPlay = true
 	//need to run `http-server --cors` for access to file server
-	wavesurfer.load("uploads/" + a)
-	wavesurfer.on('ready', function () {
-		wavesurfer.play();
-	})
-	
-	wavesurfer.on('finish', function() {
+	if(a){
+		wavesurfer.load("uploads/" + a)
+		wavesurfer.on('ready', function () {
+			wavesurfer.play();
+		})
+		let playNext = true
+		wavesurfer.on('finish', function() {
+			if(playNext){
+				wavesurfer.load("uploads/" + p)
+				playNext = false;	
+			}
+		})
+	}
+	else{
 		wavesurfer.load("uploads/" + p)
 		wavesurfer.on('ready', function () {
 			wavesurfer.play();
 		})
-	})
+	}
 	
     </script>
 </body>

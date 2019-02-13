@@ -52,7 +52,7 @@ router.get('/play', function(req, res) {
 	// check if there is a linked ad
 	let ad_ID = adStore.getLinkedAdID(podcastID).then(result => {
 		console.log("adID", result)
-		if(result && result != []){
+		if(result && result[0]){
 			// TODO there should only be one linked ad allowed. I'm sure the logic for
 			// that isn't in place yet, but for now we will assume it is and will 
 			// compensate but just using the first row returned
@@ -157,6 +157,11 @@ router.get('/play', function(req, res) {
 				})
 			//TODO link ad audio with podcast audio. will probably need a special library
 			//TODO for now, both audio files are just played consecutively
+			})
+		}else{
+			res.render('play', {
+				adPath: null,
+				epPath: req.query.path
 			})
 		}
 	})
