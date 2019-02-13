@@ -93,7 +93,7 @@ router.get('/play', function(req, res) {
 										epPath: req.query.path,
 										campaignID: campaign[0].id,
 										adID: ad[0].id,
-										contentCreatorID: req.query.owner_id
+										podcastID: podcastID
 									})/*
 									let rstream = fs.createReadStream(adPath)
 									rstream.on('error', function(err){
