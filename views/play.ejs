@@ -21,6 +21,19 @@
           <button>Logout</button>
     </form>
     <script type="text/javascript">
+    
+    // taken from authentication. need to refactor
+    function post (path, data) {
+  		return window.fetch(path, {
+    	method: 'POST',
+    	headers: {
+      		'Accept': 'application/json',
+      		'Content-Type': 'application/json'
+    	},
+    	body: JSON.stringify(data)
+  	})
+}
+
     let wavesurfer = WaveSurfer.create({
 	    container: '#waveform',
 	    waveColor: 'violet',
@@ -30,6 +43,7 @@
 	let p = "<%=epPath%>"
 	let autoPlay = true
 	//need to run `http-server --cors` for access to file server
+	//if there's a linked ad
 	if(a){
 		wavesurfer.load("uploads/" + a)
 		wavesurfer.on('ready', function () {
@@ -38,11 +52,17 @@
 		let playNext = true
 		wavesurfer.on('finish', function() {
 			if(playNext){
+				post('/payAuthor', {
+					campaignID: '<%=campaignID%>',
+					adID: '<%=adID %>',
+					podcastID: '<%=podcastID %>'
+				})
 				wavesurfer.load("uploads/" + p)
 				playNext = false;	
 			}
 		})
 	}
+	//if there is no linked ad
 	else{
 		wavesurfer.load("uploads/" + p)
 		wavesurfer.on('ready', function () {

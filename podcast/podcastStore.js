@@ -117,10 +117,15 @@ function savePodcastToDB(req, res, {episode_name, description, owner_id}) {
       })
 }
 
+function selectPodcastByID(podcastID){
+	return knex('podcast').where({id: podcastID})
+}
+
 module.exports = {
 	savePodcastToDB,
 	uploadPodcast,
 	getAllPodcasts,
 	getPodcastsForUserID,
-	getUploaderID
+	getUploaderID,
+	selectPodcastByID
 }
