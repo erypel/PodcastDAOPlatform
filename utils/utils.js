@@ -2,6 +2,7 @@
  * http://usejsdoc.org/
  */
 const crypto = require('crypto')
+const fs = require('fs'); //use the file system so we can save files
 
 function randomString(){
 	return crypto.randomBytes(4).toString('hex')

@@ -2,7 +2,6 @@
  * The Data Access Object for the ADVERTISEMENTS table
  */
 const knex = require('knex')(require('../../knexfile'))
-const fs = require('fs'); //use the file system so we can save files
 const utils = require('../../utils/utils')
 const constants = require('../../constants')
 
@@ -16,20 +15,6 @@ function saveAdToDB(req, res, {ad_name, description, owner_id}) {
 	}, 'id').then((result) => {
         return { success: true, id: result[0], path: path }
       })
-}
-
-/**
- * makes call to the DB to retrieve the ads
- * @returns
- */
-function selectAllAds(callback){
-	let ads = []
-	knex.select().table(constants.ADVERTISEMENT_TABLE).then(function(rowDataPacket){
-		rowDataPacket.forEach(function(ad){
-			ads.push(ad)
-		})
-		callback(ads)
-	})
 }
 
 function selectAdByID(adID){
