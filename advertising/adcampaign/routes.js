@@ -1,36 +1,38 @@
 /**
- * http://usejsdoc.org/
+ * This is the Ad Campaign Controller
+ * 
+ * This file contains all routing for ad campaigns
  */
 const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
 const session = require('../../authentication/session')
+const logger = require('../../logger')(__filename)
+const constants = require('../../constants')
+// The stores:
 const adStore = require('../adStore')
 const campaignStore = require('./campaignStore')
 const walletStore = require('../../wallet/walletStore')
 const podcastStore = require('../../podcast/podcastStore')
 
-router.get('/campaign', session.requireLogin, (req, res) => {
+router.get(constants.AD_CAMPAIGN_ROUTE, session.requireLogin, (req, res) => {
 	let userID = req.session.user.id
 	adStore.selectAdsByUserID(userID).then((ads) => {
 		// You can't create a campaign if you haven't uploaded an ad yet
 		if(ads.length === 0){
-			res.send('You must create an ad first!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+			res.send(constants.CREATE_AD_FIRST)
 			return
 		}
 		let dropdown = []
 		let itemsProcessed = 0
-		console.log('lenght', ads.length)
 		ads.forEach(function(el){
 			let ad = {}
 			ad.name = el.ad_name
 			ad.id = el.id
 			dropdown.push(ad)
 			itemsProcessed++
-			console.log('items processed', itemsProcessed)
 			if(itemsProcessed === ads.length){
-				console.log('dropdown', dropdown)
-				res.render('campaign', {
+				res.render(constants.CAMPAIGN_VIEW, {
 					ads: dropdown
 				})
 			}
@@ -38,26 +40,26 @@ router.get('/campaign', session.requireLogin, (req, res) => {
 	})
 })
 
-router.post('/createCampaign', session.requireLogin, (req, res) => {
-	console.log(req.body)
+router.post(constants.CREATE_AD_CAMPAIGN_ROUTE, session.requireLogin, (req, res) => {
 	let userID = req.session.user.id
 	campaignStore.insertAdCampaign(req.body, userID).then(({success}) => {
 		if(success) {
-			res.send('Success!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
+			res.send(constants.SUCCESS_AND_RETURN_TO_DASHBOARD)
 		}
 		else res.sendStatus(400)
 	})
 })
 
-router.post('/payAuthor', session.requireLogin, (req, res) => {
+router.post(constants.PAY_AUTHOR_ROUTE, session.requireLogin, (req, res) => {
 	let campaignID = req.body.campaignID
 	let adID = req.body.adID
 	let podcastID = req.body.podcastID
 	
-	console.log("finished!!!!!!")
 	// TODO if any of these fail, they should all be rolled back
 	// once the ad has finished playing, debit the advertiser and
 	// escrow/campaign record
+	
+	//TODO avoid callback hell
 	podcastStore.getUploaderID(podcastID).then(contentCreator => {
 		let contentCreatorID = contentCreator[0].owner_id
 		adStore.selectAdByID(adID).then(ad => {
@@ -103,23 +105,13 @@ router.post('/payAuthor', session.requireLogin, (req, res) => {
 										}
 									}
 								})
-							})
-
-							
+							})				
 						})
-					})
-					
-					
-					
+					})		
 				})
-				
 			})
 		})
 	})
-	
-	
-	
-	
 })
 
 module.exports = router

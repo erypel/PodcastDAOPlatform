@@ -1,7 +1,10 @@
 /**
- * http://usejsdoc.org/
+ * The Data Access Object for Ad Campaigns.
+ * 
+ * This file contains all the CRUD operations for the db table ADCAMPAIGN
  */
 const knex = require('knex')(require('../../knexfile'))
+const logger = require('../../logger')(__filename)
 
 function insertAdCampaign(campaign, userID){
 	return knex('adcampaign').insert({
@@ -20,6 +23,10 @@ function insertAdCampaign(campaign, userID){
 
 }
 
+function updateCurrAmount(id, newBalance){
+	return knex('adcampaign').where({id: id}).update({curr_amount: newBalance})
+}
+
 function selectAllAdCampaigns(){
 	return knex('adcampaign')
 }
@@ -29,14 +36,8 @@ function getAdCampaignForAd(adID){
 }
 
 function deleteCampaign(campaignID){
-	console.log('Removing campaign with ID ' + campaingID)
+	logger.info("Deleting campaign with id:%d", campaignID)
 	return knex('adcampaign').where({id: campaignID}).del()
-}
-
-function updateCurrAmount(id, newBalance){
-	console.log("id:", id)
-	console.log("new balance:", newBalance)
-	return knex('adcampaign').where({id: id}).update({curr_amount: newBalance})
 }
 
 module.exports = {
