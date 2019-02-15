@@ -20,9 +20,9 @@ app.use(require('./podcast/routes'))
 app.use(require('./rss/routes'))
 app.use(require('./wallet/routes'))
 app.use(require('./rippled/routes'))
-app.use(require('./advertising/routes'))
+app.use(require('./advertising/advertisements/routes'))
 app.use(require('./advertising/adcampaign/routes'))
 
 app.listen(3000, () => {
-	console.log('Server running on http://localhost:3000')
+	logger.info('Server running on http://localhost:3000')
 })

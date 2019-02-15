@@ -1,10 +1,14 @@
 /**
- * http://usejsdoc.org/
+ * The Data Access Object for Ad Campaigns.
+ * 
+ * This file contains all the CRUD operations for the db table ADCAMPAIGN
  */
 const knex = require('knex')(require('../../knexfile'))
+const constants = require('../../constants')
+const logger = require('../../logger')(__filename)
 
 function insertAdCampaign(campaign, userID){
-	return knex('adcampaign').insert({
+	return knex(constants.AD_CAMPAIGN_TABLE).insert({
 		title: campaign.title,
 		description: campaign.description,
 		init_amount: campaign.budget,
@@ -20,23 +24,21 @@ function insertAdCampaign(campaign, userID){
 
 }
 
+function updateCurrAmount(id, newBalance){
+	return knex(constants.AD_CAMPAIGN_TABLE).where({id: id}).update({curr_amount: newBalance})
+}
+
 function selectAllAdCampaigns(){
-	return knex('adcampaign')
+	return knex(constants.AD_CAMPAIGN_TABLE)
 }
 
 function getAdCampaignForAd(adID){
-	return knex('adcampaign').where({ad_id: adID})
+	return knex(constants.AD_CAMPAIGN_TABLE).where({ad_id: adID})
 }
 
 function deleteCampaign(campaignID){
-	console.log('Removing campaign with ID ' + campaingID)
-	return knex('adcampaign').where({id: campaignID}).del()
-}
-
-function updateCurrAmount(id, newBalance){
-	console.log("id:", id)
-	console.log("new balance:", newBalance)
-	return knex('adcampaign').where({id: id}).update({curr_amount: newBalance})
+	logger.info("Deleting campaign with id:%d", campaignID)
+	return knex(constants.AD_CAMPAIGN_TABLE).where({id: campaignID}).del()
 }
 
 module.exports = {

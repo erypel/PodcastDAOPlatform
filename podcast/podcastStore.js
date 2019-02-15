@@ -11,21 +11,12 @@ function constructPathToPodcastOnFileStore(userID){
 	// each user will have a folder in the filestore to store their files
 	return userID + '/' 
 }
-
-function createFileName(episodeName, mimetype){
-	let extension = '.error'
-	if(mimetype === 'audio/wav')
-		extension = '.wav'
-	else if(mimetype === 'audio/mp3')
-		extension = '.mp3'
-	return episodeName + extension
-}
 // END UTILITY FUNCTIONS
 
 function saveFileToFileStore(file, userID, episodeName){
 	let bufDataFile = Buffer.from(file.data, "utf-8");
 	let pathInFileStore = constructPathToPodcastOnFileStore(userID)
-	let fileName = createFileName(episodeName, file.mimetype)
+	let fileName = utils.createFileName(episodeName, file.mimetype)
 	let target_path = utils.getPathToFileStore() + pathInFileStore
 	
 	// create the directory if it doesn't exist
