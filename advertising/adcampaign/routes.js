@@ -16,7 +16,7 @@ const campaignStore = require('./campaignStore')
 const walletStore = require('../../wallet/walletStore')
 const podcastStore = require('../../podcast/podcastStore')
 
-router.get(constants.AD_CAMPAIGN_ROUTE, session.requireLogin, (req, res) => {
+router.get('/campaign', session.requireLogin, (req, res) => {
 	let userID = req.session.user.id
 	adStore.selectAdsByUserID(userID).then((ads) => {
 		// You can't create a campaign if you haven't uploaded an ad yet
@@ -41,7 +41,7 @@ router.get(constants.AD_CAMPAIGN_ROUTE, session.requireLogin, (req, res) => {
 	})
 })
 
-router.post(constants.CREATE_AD_CAMPAIGN_ROUTE, session.requireLogin, (req, res) => {
+router.post('/createCampaign', session.requireLogin, (req, res) => {
 	let userID = req.session.user.id
 	campaignStore.insertAdCampaign(req.body, userID).then(({success}) => {
 		if(success) {
@@ -51,7 +51,7 @@ router.post(constants.CREATE_AD_CAMPAIGN_ROUTE, session.requireLogin, (req, res)
 	})
 })
 
-router.post(constants.PAY_AUTHOR_ROUTE, session.requireLogin, (req, res) => {
+router.post('/payAuthor', session.requireLogin, (req, res) => {
 	let campaignID = req.body.campaignID
 	let adID = req.body.adID
 	let podcastID = req.body.podcastID
