@@ -4,6 +4,10 @@
  */
 const express = require('express')
 const app = express()
+const logger = require('./logger')(__filename)
+
+logger.info('Logger is initialized.')
+
 app.set('view engine', 'ejs');
 
 //Static audio files
