@@ -10,6 +10,11 @@ module.exports = Object.freeze({
 	// VIEWS
 	CAMPAIGN_VIEW: 'campaign',
 	
+	// DATABASE TABLES
+	AD_CAMPAIGN_TABLE: 'adcampaign',
+	ADVERTISEMENT_TABLE: 'advertisement',
+	AD_LINK_TABLE: 'adlink',
+	
 	// USER PROFILES
 	CONTENT_CREATOR_USER_PROFILE: 'CONTENT_CREATOR',
 	ADVERTISER_USER_PROFILE: 'ADVERTISER',

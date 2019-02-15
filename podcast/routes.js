@@ -7,13 +7,13 @@ const bodyParser = require('body-parser')
 const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
 const podcastStore = require('./podcastStore')
 const rssStore = require('../rss/rssStore')
-const adStore = require('../advertising/adStore')
+const adStore = require('../advertising/advertisements/adStore')
 const session = require('../authentication/session')
 const fs = require('fs')
 const utils = require('../utils/utils')
 const campaignStore = require('../advertising/adcampaign/campaignStore')
 const walletStore = require('../wallet/walletStore')
-//const WaveSurfer = require('wavesurfer.js');
+const linkStore = require('../advertising/adlink/linkStore')
 router.use(fileupload())
 router.use(bodyParser.json())
 
@@ -50,7 +50,7 @@ router.get('/play', function(req, res) {
 
 	//TODO avoid getting super nested
 	// check if there is a linked ad
-	let ad_ID = adStore.getLinkedAdID(podcastID).then(result => {
+	let ad_ID = linkStore.getLinkedAdID(podcastID).then(result => {
 		console.log("adID", result)
 		if(result && result[0]){
 			// TODO there should only be one linked ad allowed. I'm sure the logic for
@@ -78,7 +78,7 @@ router.get('/play', function(req, res) {
 							//remove the ad campaign. there's no money left!
 							campaignStore.deleteCampaign(campaign[0].id)
 							//also unlink the ad from this podcast
-							adStore.removeLink(podcastID, ad[0].id)
+							linkStore.removeLink(podcastID, ad[0].id)
 						}
 						else{
 							//TODO this will have to be revamped with a 'playlist' of sorts and will be easier

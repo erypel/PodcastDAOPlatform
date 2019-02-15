@@ -10,7 +10,8 @@ const session = require('../../authentication/session')
 const logger = require('../../logger')(__filename)
 const constants = require('../../constants')
 // The stores:
-const adStore = require('../adStore')
+const adStore = require('../advertisements/adStore')
+const linkStore = require('../adlink/linkStore')
 const campaignStore = require('./campaignStore')
 const walletStore = require('../../wallet/walletStore')
 const podcastStore = require('../../podcast/podcastStore')
@@ -101,7 +102,7 @@ router.post(constants.PAY_AUTHOR_ROUTE, session.requireLogin, (req, res) => {
 											// remove the ad campaign. there's no money left!
 											campaignStore.deleteCampaign(campaign[0].id)
 											// also unlink the ad from this podcast
-											adStore.removeLink(podcastID, ad[0].id)
+											linkStore.removeLink(podcastID, ad[0].id)
 										}
 									}
 								})

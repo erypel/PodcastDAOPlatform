@@ -5,10 +5,11 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
 const fileupload = require("express-fileupload"); //TODO too slow for large files, update later
-const session = require('../authentication/session')
+const session = require('../../authentication/session')
 const adStore = require('./adStore')
-const podcastStore = require('../podcast/podcastStore')
-const campaignStore = require('./adcampaign/campaignStore')
+const podcastStore = require('../../podcast/podcastStore')
+const campaignStore = require('../adcampaign/campaignStore')
+const linkStore = require('../adlink/linkStore')
 const fs = require('fs')
 
 router.use(bodyParser.json())
@@ -41,7 +42,7 @@ router.post('/selectPodcast', session.requireLogin, (req, res) => {
 	console.log(req.body)
 	let advertisementID = req.body.advertisementID
 	let podcastID = req.body.podcastID
-	adStore.linkAdToPodcast(advertisementID, podcastID).then(({success, id, path}) => {
+	linkStore.linkAdToPodcast(advertisementID, podcastID).then(({success, id, path}) => {
 		if(success) {
 			res.send('Linked!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>')
 		}
