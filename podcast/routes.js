@@ -102,7 +102,10 @@ router.get('/play', function(req, res) {
 		}else{
 			res.render('play', {
 				adPath: null,
-				epPath: req.query.path
+				epPath: req.query.path,
+				campaignID: null,
+				adID: null,
+				podcastID: null
 			})
 		}
 	})
