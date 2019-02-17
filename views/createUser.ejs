@@ -5,15 +5,6 @@
 <title>Create User</title>
 </head>
 <body>
-	<!-- 
-	TODO LIST
-	* check that password is adequately complex
-	
-	Need to display the password policies here explicitly
-	
-	If a new password doesn't comply with the complexity policies, the error
-	message should display every broken rule instead of just the first one
-	 -->
 	<form class="CreateUser">
 		<h1>Create a new user</h1>
 		<h2>Passwords must meet these conditions: </h2>
@@ -26,6 +17,7 @@
 		</ul>
 		<input type="text" class="username" placeholder="username" required> 
 		<input type="text" class="email" placeholder="email"> 
+		<input type="hidden" class="profile" value="<%=profile%>">
 		<input type="password" class="password" placeholder="password" required> 
 		<input type="submit" value="Create user">
 	</form>

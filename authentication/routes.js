@@ -1,9 +1,12 @@
 /**
- * http://usejsdoc.org/
+ * The authentication and account creation controller
  */
 const express = require('express')
 const router = express.Router()
-const userStore = require('./store')
+const utils = require('../utils/utils')
+const constants = require('../constants')
+const logger = require('../logger')(__filename)
+const userStore = require('./userStore')
 const walletStore = require('../wallet/walletStore')
 const bodyParser = require('body-parser')
 
@@ -19,11 +22,15 @@ router.get('/logout', function(req, res){
 })
 
 router.get('/createUser', function(req, res) {
-	res.render("createUser")
+	res.render("createUser", {
+		profile: constants.CONTENT_CREATOR_USER_PROFILE
+	})
 })
 
 router.get('/createAdvertiser', function(req, res) {
-	res.render('createAdvertiser')
+	res.render('createUser', {
+		profile: constants.ADVERTISER_USER_PROFILE
+	})
 })
 
 // TODO need to create secure password recovery: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet
@@ -35,8 +42,9 @@ router.get('/createAdvertiser', function(req, res) {
 router.post('/createUser', (req, res) => {
 	let password = req.body.password
 	// Validate password is sufficiently secure
-	let validPassword = userStore.validatePassword(password)
+	let validPassword = utils.validatePassword(password)
 	let username = req.body.username
+	let profile = req.body.profile
 	// User IDs should be unique, check for uniqueness
 	userStore.getUser(username).then((existingUser) => {
 		if(existingUser){
@@ -49,7 +57,8 @@ router.post('/createUser', (req, res) => {
 				userStore.createUser({
 					username: username,
 					email: req.body.email,
-					password: password
+					password: password,
+					profile: profile
 				}).then((result) => {
 					walletStore.createWallet(result)
 					res.sendStatus(200)
@@ -63,49 +72,29 @@ router.post('/createUser', (req, res) => {
 	})
 })
 
-router.post('/createAdvertiser', (req, res) => {
-	let password = req.body.password
-	// Validate password is sufficiently secure
-	let validPassword = userStore.validatePassword(password)
-	let username = req.body.username
-	// User IDs should be unique, check for uniqueness
-	userStore.getUser(username).then((existingUser) => {
-		if(existingUser){
-			res.statusMessage = 'Username not available.'
-			res.status(400).end()
-		}
-		else{
-			//If the username is unique and has a valid password, create the user
-			if(validPassword.success){
-				userStore.createAdvertiser({
-					username: username,
-					email: req.body.email,
-					password: password
-				}).then((result) => {
-					walletStore.createWallet(result)
-					res.sendStatus(200)
-				})
-			}
-			else{
-				res.statusMessage = validPassword.message
-				res.status(400).end()
-			}
-		}
-	})
-})
-
+/*
+ * Enable logging and monitoring of authentication functions to detect attacks /
+ * failures on a real time basis
+ * 
+ * Ensure that all failures are logged and reviewed Ensure that all password
+ * failures are logged and reviewed 
+ */
 router.post('/login', (req, res) => {
+	let username = req.body.username
+	let password = req.body.password
 	userStore.authenticate({
-		username: req.body.username,
-		password: req.body.password
+		username: username,
+		password: password
 	}).then(({success, user, message}) => {
 		if(success) {
 			// set cookie with the user's info. Might want to use something else later
+			logger.info(`User::${user}::successfully logged in`)
 			req.session.user = user
 			res.sendStatus(200)
 		}
 		else{
-			console.log(message)
+			logger.warn('Failed login attempt for username::' + username + 
+					':: with password::' + password + ':: with message::' + message)
 			res.statusMessage = message
 			res.status(400).end()
 		}

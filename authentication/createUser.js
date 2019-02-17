@@ -7,7 +7,8 @@ CreateUser.addEventListener('submit', (e) => {
   const username = CreateUser.querySelector('.username').value
   const email = CreateUser.querySelector('.email').value
   const password = CreateUser.querySelector('.password').value
-  post('/createUser', { username, email, password }).then(function(res){
+  const profile = CreateUser.querySelector('.profile').value
+  post('/createUser', { username, email, password, profile }).then(function(res){
 	  /*
 		 * Authentication Responses An application should respond with a generic
 		 * error message regardless of whether the user ID or password was
