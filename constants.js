@@ -12,6 +12,7 @@ module.exports = Object.freeze({
 	AD_CAMPAIGN_TABLE: 'adcampaign',
 	ADVERTISEMENT_TABLE: 'advertisement',
 	AD_LINK_TABLE: 'adlink',
+	USER_TABLE: 'user',
 	
 	// USER PROFILES
 	CONTENT_CREATOR_USER_PROFILE: 'CONTENT_CREATOR',
@@ -22,6 +23,10 @@ module.exports = Object.freeze({
 	
 	// AD CAMPAIGN MESSAGES
 	CREATE_AD_FIRST: 'You must create an ad first!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',
+	
+	// AUTHENTICATION MESSAGES
+	LOGIN_FAILED: 'Login failed. Invalid userID or password',
+	USER_IS_LOCKED: 'User is locked.',
 	
 	// ADVERTISEMENT MESSAGES
 	LINK_SUCCESS_MESSAGE: 'Linked!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',

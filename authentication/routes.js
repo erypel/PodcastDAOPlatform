@@ -4,6 +4,7 @@
 const express = require('express')
 const router = express.Router()
 const utils = require('../utils/utils')
+const constants = require('../constants')
 const userStore = require('./store')
 const walletStore = require('../wallet/walletStore')
 const bodyParser = require('body-parser')
@@ -20,11 +21,15 @@ router.get('/logout', function(req, res){
 })
 
 router.get('/createUser', function(req, res) {
-	res.render("createUser")
+	res.render("createUser", {
+		profile: constants.CONTENT_CREATOR_USER_PROFILE
+	})
 })
 
 router.get('/createAdvertiser', function(req, res) {
-	res.render('createAdvertiser')
+	res.render('createUser', {
+		profile: constants.ADVERTISER_USER_PROFILE
+	})
 })
 
 // TODO need to create secure password recovery: https://www.owasp.org/index.php/Forgot_Password_Cheat_Sheet
@@ -38,6 +43,7 @@ router.post('/createUser', (req, res) => {
 	// Validate password is sufficiently secure
 	let validPassword = utils.validatePassword(password)
 	let username = req.body.username
+	let profile = req.body.profile
 	// User IDs should be unique, check for uniqueness
 	userStore.getUser(username).then((existingUser) => {
 		if(existingUser){
@@ -50,38 +56,8 @@ router.post('/createUser', (req, res) => {
 				userStore.createUser({
 					username: username,
 					email: req.body.email,
-					password: password
-				}).then((result) => {
-					walletStore.createWallet(result)
-					res.sendStatus(200)
-				})
-			}
-			else{
-				res.statusMessage = validPassword.message
-				res.status(400).end()
-			}
-		}
-	})
-})
-
-router.post('/createAdvertiser', (req, res) => {
-	let password = req.body.password
-	// Validate password is sufficiently secure
-	let validPassword = utils.validatePassword(password)
-	let username = req.body.username
-	// User IDs should be unique, check for uniqueness
-	userStore.getUser(username).then((existingUser) => {
-		if(existingUser){
-			res.statusMessage = 'Username not available.'
-			res.status(400).end()
-		}
-		else{
-			//If the username is unique and has a valid password, create the user
-			if(validPassword.success){
-				userStore.createAdvertiser({
-					username: username,
-					email: req.body.email,
-					password: password
+					password: password,
+					profile: profile
 				}).then((result) => {
 					walletStore.createWallet(result)
 					res.sendStatus(200)

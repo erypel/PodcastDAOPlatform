@@ -132,17 +132,17 @@ function validatePassword(password){
  * @returns
  */
 function saltHashPassword ({
-	  password,
-	  salt = randomString()
-	}) {
-	  const hash = crypto
-	    .createHmac('sha512', salt)
-	    .update(password)
-	  return {
-	    salt,
-	    hash: hash.digest('hex')
-	  }
+	password,
+	salt = randomString()
+}) {
+	const hash = crypto
+	.createHmac('sha512', salt)
+	.update(password)
+	return {
+		salt,
+		hash: hash.digest('hex')
 	}
+}
 
 module.exports = {
 		randomString,
@@ -150,5 +150,6 @@ module.exports = {
 		createFileName,
 		constructPathToAdvertisementOnFileStore,
 		uploadAd,
-		validatePassword
+		validatePassword,
+		saltHashPassword
 	}
