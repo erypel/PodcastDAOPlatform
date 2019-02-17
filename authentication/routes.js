@@ -3,6 +3,7 @@
  */
 const express = require('express')
 const router = express.Router()
+const utils = require('../utils/utils')
 const userStore = require('./store')
 const walletStore = require('../wallet/walletStore')
 const bodyParser = require('body-parser')
@@ -35,7 +36,7 @@ router.get('/createAdvertiser', function(req, res) {
 router.post('/createUser', (req, res) => {
 	let password = req.body.password
 	// Validate password is sufficiently secure
-	let validPassword = userStore.validatePassword(password)
+	let validPassword = utils.validatePassword(password)
 	let username = req.body.username
 	// User IDs should be unique, check for uniqueness
 	userStore.getUser(username).then((existingUser) => {
@@ -66,7 +67,7 @@ router.post('/createUser', (req, res) => {
 router.post('/createAdvertiser', (req, res) => {
 	let password = req.body.password
 	// Validate password is sufficiently secure
-	let validPassword = userStore.validatePassword(password)
+	let validPassword = utils.validatePassword(password)
 	let username = req.body.username
 	// User IDs should be unique, check for uniqueness
 	userStore.getUser(username).then((existingUser) => {
