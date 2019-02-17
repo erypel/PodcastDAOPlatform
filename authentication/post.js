@@ -1,6 +1,3 @@
-/**
- * http://usejsdoc.org/
- */
 function post (path, data) {
   return window.fetch(path, {
     method: 'POST',

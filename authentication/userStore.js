@@ -1,5 +1,8 @@
 /**
- * http://usejsdoc.org/
+ * This is the Data Access Object for the USER table
+ * 
+ * This store also contains methods relying on the USER table for 
+ * login and authentication
  */
 const knex = require('knex')(require('../knexfile'))
 const utils = require('../utils/utils')
@@ -45,6 +48,8 @@ function incrementLockCount(user){
 			})
 		}, 60*1000)
 	}
+	// Ensure that all account lockouts are logged and reviewed
+	logger.warn(`Incrementing user::${user}::lockcount`)
 	return knex(constants.USER_TABLE).increment('lock_count').where({id: user.id})
 }
 

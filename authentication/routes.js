@@ -1,11 +1,12 @@
 /**
- * http://usejsdoc.org/
+ * The authentication and account creation controller
  */
 const express = require('express')
 const router = express.Router()
 const utils = require('../utils/utils')
 const constants = require('../constants')
-const userStore = require('./store')
+const logger = require('../logger')(__filename)
+const userStore = require('./userStore')
 const walletStore = require('../wallet/walletStore')
 const bodyParser = require('body-parser')
 
@@ -71,18 +72,29 @@ router.post('/createUser', (req, res) => {
 	})
 })
 
+/*
+ * Enable logging and monitoring of authentication functions to detect attacks /
+ * failures on a real time basis
+ * 
+ * Ensure that all failures are logged and reviewed Ensure that all password
+ * failures are logged and reviewed 
+ */
 router.post('/login', (req, res) => {
+	let username = req.body.username
+	let password = req.body.password
 	userStore.authenticate({
-		username: req.body.username,
-		password: req.body.password
+		username: username,
+		password: password
 	}).then(({success, user, message}) => {
 		if(success) {
 			// set cookie with the user's info. Might want to use something else later
+			logger.info(`User::${user}::successfully logged in`)
 			req.session.user = user
 			res.sendStatus(200)
 		}
 		else{
-			console.log(message)
+			logger.warn('Failed login attempt for username::' + username + 
+					':: with password::' + password + ':: with message::' + message)
 			res.statusMessage = message
 			res.status(400).end()
 		}
