@@ -8,6 +8,8 @@ const fileupload = require("express-fileupload"); //TODO too slow for large file
 const podcastStore = require('./podcastStore')
 const rssStore = require('../rss/rssStore')
 const adStore = require('../advertising/advertisements/adStore')
+const commentStore = require('../comment/commentStore')
+const commentSectionBuilder = require('../comment/comment')
 const session = require('../authentication/session')
 const fs = require('fs')
 const utils = require('../utils/utils')
@@ -47,67 +49,74 @@ router.get('/podcast', session.requireLogin, (req, res) => {
  */ 
 router.get('/play', function(req, res) {
 	let podcastID = req.query.id
+	let comments = []
+	//TODO minimize nesting
+	commentStore.getCommentsForPodcast(podcastID).then(results => {
+		commentSectionBuilder.buildCommentSectionDataObject(results).then(obj =>{
+			comments = obj
+			// check if there is a linked ad
+			let ad_ID = linkStore.getLinkedAdID(podcastID).then(result => {
+				console.log("adID", result)
+				if(result && result[0]){
+					// TODO there should only be one linked ad allowed. I'm sure the logic for
+					// that isn't in place yet, but for now we will assume it is and will 
+					// compensate but just using the first row returned
+					let ad = adStore.selectAdByID(result[0].ad_ID).then(ad => {
+						console.log('ad', ad[0])
+						//check to make sure that there are still funds held in escrow.
+						// TODO this will get tricky and we will want to place locks 
+						// on funds to avoid multi-thread/concurrency issues
+						campaignStore.getAdCampaignForAd(ad[0].id).then(campaign => {
+							// TODO There should only be one campaign per ad. There is no logic to check for
+							// this yet, so we just use the first row returned
+							if(!campaign[0] || campaign === [] ){
+								return
+							}
+							else{
+								console.log('campaign', campaign[0])
+								let pricePerView = campaign[0].pay_per_view
+								if(Number(campaign[0].curr_amount) - Number(pricePerView) < 0.000000){
+									//there's no need to update an advertiser's wallet if they still have some dust
+									//in their escrow record since their personal wallet should not have been deducted
+									//that dust
 
-	//TODO avoid getting super nested
-	// check if there is a linked ad
-	let ad_ID = linkStore.getLinkedAdID(podcastID).then(result => {
-		console.log("adID", result)
-		if(result && result[0]){
-			// TODO there should only be one linked ad allowed. I'm sure the logic for
-			// that isn't in place yet, but for now we will assume it is and will 
-			// compensate but just using the first row returned
-			let ad = adStore.selectAdByID(result[0].ad_ID).then(ad => {
-				console.log('ad', ad[0])
-				//check to make sure that there are still funds held in escrow.
-				// TODO this will get tricky and we will want to place locks 
-				// on funds to avoid multi-thread/concurrency issues
-				campaignStore.getAdCampaignForAd(ad[0].id).then(campaign => {
-					// TODO There should only be one campaign per ad. There is no logic to check for
-					// this yet, so we just use the first row returned
-					if(!campaign[0] || campaign === [] ){
-						return
-					}
-					else{
-						console.log('campaign', campaign[0])
-						let pricePerView = campaign[0].pay_per_view
-						if(Number(campaign[0].curr_amount) - Number(pricePerView) < 0.000000){
-							//there's no need to update an advertiser's wallet if they still have some dust
-							//in their escrow record since their personal wallet should not have been deducted
-							//that dust
+									//remove the ad campaign. there's no money left!
+									campaignStore.deleteCampaign(campaign[0].id)
+									//also unlink the ad from this podcast
+									linkStore.removeLink(podcastID, ad[0].id)
+								}
+								else{
+									//TODO this will have to be revamped with a 'playlist' of sorts and will be easier
+									// to implement after finalizing audio playing, which will now be the next step
+									console.log('the escrow has sufficient funds')
+									//play the ad
+									let adPath = ad[0].path
+									console.log('ad path', adPath)
 
-							//remove the ad campaign. there's no money left!
-							campaignStore.deleteCampaign(campaign[0].id)
-							//also unlink the ad from this podcast
-							linkStore.removeLink(podcastID, ad[0].id)
-						}
-						else{
-							//TODO this will have to be revamped with a 'playlist' of sorts and will be easier
-							// to implement after finalizing audio playing, which will now be the next step
-							console.log('the escrow has sufficient funds')
-							//play the ad
-							let adPath = ad[0].path
-							console.log('ad path', adPath)
-
-							res.render('play', {
-								adPath: adPath,
-								epPath: req.query.path,
-								campaignID: campaign[0].id,
-								adID: ad[0].id,
-								podcastID: podcastID
-							})
-						}
-					}
-				})
+									res.render('play', {
+										adPath: adPath,
+										epPath: req.query.path,
+										campaignID: campaign[0].id,
+										adID: ad[0].id,
+										podcastID: podcastID,
+										comments: comments
+									})
+								}
+							}
+						})
+					})
+				}else{
+					res.render('play', {
+						adPath: null,
+						epPath: req.query.path,
+						campaignID: null,
+						adID: null,
+						podcastID: podcastID,
+						comments: comments
+					})
+				}
 			})
-		}else{
-			res.render('play', {
-				adPath: null,
-				epPath: req.query.path,
-				campaignID: null,
-				adID: null,
-				podcastID: podcastID
-			})
-		}
+		})
 	})
 })
 

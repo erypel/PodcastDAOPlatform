@@ -23,6 +23,23 @@
 			<input type="submit" value="Add comment" />
 		</form>
 		<div id="comments">
+			<table border="1">
+			<tr>
+				<th>User</th><th>Comment</th><th>Reply</th><th>Tip</th>
+			</tr>
+			<% comments.forEach(function(comment) { %>
+				<tr>
+					<td><%=comment.commenter%></td>
+					<td><%=comment.message%></td>
+					<td><a href=""><button>Reply</button></a></td>
+					<td>
+						<form action="" method = "post">
+          					<button>Tip 1 XRP</button>
+    					</form>
+    				</td>
+				</tr>
+			<% }) %>
+		</table>
 		</div>
 	</section>
 	<br>

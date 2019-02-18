@@ -17,6 +17,11 @@ function insertComment(comment){
 	})
 }
 
+function getCommentsForPodcast(podcastID){
+	return knex('comment').where({podcast_id: podcastID})
+}
+
 module.exports = {
-	insertComment
+	insertComment,
+	getCommentsForPodcast
 }
