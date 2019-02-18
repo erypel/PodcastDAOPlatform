@@ -113,11 +113,16 @@ function getUserID(username) {
 	return knex(constants.USER_TABLE).select('id').where({username}).first()
 }
 
+function getUsername(userID){
+	return knex(constants.USER_TABLE).select('username').where({id: userID})
+}
+
 //END CRUD FUNCTIONS
 
 module.exports = {
 		createUser,
 		authenticate,
 		getUser,
-		getUserID
+		getUserID,
+		getUsername
 }

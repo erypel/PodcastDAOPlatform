@@ -22,6 +22,7 @@ app.use(require('./wallet/routes'))
 app.use(require('./rippled/routes'))
 app.use(require('./advertising/advertisements/routes'))
 app.use(require('./advertising/adcampaign/routes'))
+app.use(require('./comment/routes'))
 
 app.listen(3000, () => {
 	logger.info('Server running on http://localhost:3000')
