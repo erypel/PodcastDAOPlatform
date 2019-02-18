@@ -17,7 +17,7 @@
 	<br>
 	<section id="discussion">
 		<h3>Discussion Section</h3>
-		<form action="/comment" method="post" id="postCommentForm">
+		<form action="/comment" method="post" id="postCommentForm" onsubmit="refreshComments()"'>
 			<input type="text" name="comment" placeholder="Add to the discussion..." required />
 			<input type="hidden" name="podcastID" value="<%=podcastID%>"/>
 			<input type="submit" value="Add comment" />
@@ -52,6 +52,11 @@
 		</form>
 	</section>
 
+	<script type="text/javascript">
+		function refreshComments(){
+			//TODO
+		}
+	</script>
 	<script type="text/javascript">
 		//TODO this script should go in its own file
 		// taken from authentication. need to refactor
