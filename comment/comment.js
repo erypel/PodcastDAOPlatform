@@ -2,6 +2,9 @@ const userStore = require('../authentication/userStore')
 
 function buildCommentSectionDataObject(comments){
 	return new Promise(function(resolve, reject){
+		if(comments.length === 0){
+			resolve([])
+		}
 		let commentSectionDataObject = []
 		let promiseChain = Promise.resolve()
 		let currentComment;
