@@ -105,7 +105,7 @@ router.get('/play', function(req, res) {
 				epPath: req.query.path,
 				campaignID: null,
 				adID: null,
-				podcastID: null
+				podcastID: podcastID
 			})
 		}
 	})
