@@ -1,6 +1,6 @@
 /**
  * documentation for this type of transaction:
- * https://developers.ripple.com/rippleapi-reference.html#escrow-creation
+ * https://developers.ripple.com/rippleapi-reference.html#escrow-cancellation
  */
 const logger = require('../../utils/logger')(__filename)
 const RippleAPI = require('ripple-lib').RippleAPI
