@@ -53,7 +53,7 @@ function Specification(amount, destination, allowCancelAfter, allowExecuteAfter,
 function prepareEscrowCreationTransaction(address, specification, instructions) {
 	api.connect().then(() => {
 		logger.info('getting prepareEscrowCreation')
-		return api.prepareEscrowCreation(address, payment)
+		return api.prepareEscrowCreation(address, specification)
 	}).then(prepared => {
 		logger.info(prepared)
 		logger.info('prepareEscrowCreation done')
