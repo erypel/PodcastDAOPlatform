@@ -5,7 +5,7 @@
  */
 const knex = require('knex')(require('../../knexfile'))
 const constants = require('../../constants')
-const logger = require('../../logger')(__filename)
+const logger = require('../../utils/logger')(__filename)
 
 function insertAdCampaign(campaign, userID){
 	return knex(constants.AD_CAMPAIGN_TABLE).insert({

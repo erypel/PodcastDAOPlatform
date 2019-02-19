@@ -7,7 +7,7 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
 const session = require('../../authentication/session')
-const logger = require('../../logger')(__filename)
+const logger = require('../../utils/logger')(__filename)
 const constants = require('../../constants')
 // The stores:
 const adStore = require('../advertisements/adStore')
