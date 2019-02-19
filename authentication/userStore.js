@@ -6,7 +6,7 @@
  */
 const knex = require('knex')(require('../knexfile'))
 const utils = require('../utils/utils')
-const logger = require('../logger')(__filename)
+const logger = require('../utils/logger')(__filename)
 const constants = require('../constants')
 
 //BEGIN UTILITY FUNCTIONS

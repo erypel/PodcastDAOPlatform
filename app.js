@@ -4,7 +4,7 @@
  */
 const express = require('express')
 const app = express()
-const logger = require('./logger')(__filename)
+const logger = require('./utils/logger')(__filename)
 
 logger.info('Logger is initialized.')
 
