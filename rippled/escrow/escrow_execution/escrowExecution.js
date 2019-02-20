@@ -28,17 +28,19 @@ function Specification(owner, escrowSequence, condition, fulfillment, memos){
 	
 function prepareEscrowExecutionTransaction(address, specification, instructions) {
 	api.connect().then(() => {
-		logger.info('getting prepareEscrowExecution')
+		logger.debug('getting prepareEscrowExecution')
 		return api.prepareEscrowCreation(address, payment)
 	}).then(prepared => {
-		logger.info(prepared)
-		logger.info('prepareEscrowExecution done')
+		logger.debug(prepared)
+		logger.debug('prepareEscrowExecution done')
 		signTransaction(prepared.txJSON, constants.DAO_SECRET)
 	}).then(() => {
-		//return api.disconnect()
+		return api.disconnect()
 	}).then(() => {
-		logger.info('done and disconnected')
-	}).catch(console.error)
+		logger.debug('done and disconnected')
+	}).catch(error => {
+		logger.error(error)
+	})
 }
 
 module.exports = {

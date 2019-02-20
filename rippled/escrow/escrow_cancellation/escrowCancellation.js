@@ -24,17 +24,19 @@ function Specification(owner, escrowSequence, memos){
 
 function prepareEscrowCancellationTransaction(address, specification, instructions){
 	api.connect().then(() => {
-		logger.info('getting prepareEscrowCancellation')
+		logger.debug('getting prepareEscrowCancellation')
 		return api.prepareEscrowCancellation(address, specification)
 	}).then(prepared => {
-		logger.info(prepared)
-		logger.info('prepareEscrowCancellation done')
+		logger.debug(prepared)
+		logger.debug('prepareEscrowCancellation done')
 		signTransaction(prepared.txJSON, constants.DAO_SECRET)
 	}).then(() => {
-		//return api.disconnect()
+		return api.disconnect()
 	}).then(() => {
-		logger.info('done and disconnected')
-	}).catch(console.error)
+		logger.debug('done and disconnected')
+	}).catch(error => {
+		logger.error(error)
+	})
 }
 
 module.exports = {

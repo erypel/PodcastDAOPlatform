@@ -1,5 +1,6 @@
 const walletStore = require('../wallet/walletStore')
 const Decimal = require('decimal.js')
+const logger = require('../utils/logger')(__filename)
 
 //TODO consider re-authentication when moving lots of $$$ https://www.owasp.org/index.php/Transaction_Authorization_Cheat_Sheet	
 
@@ -22,7 +23,6 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 						walletStore.getUserBalance(destinationUserID).then((balance) => {
 							let tippeeBalance = new Decimal(balance)
 							let tippeeNewBalance = tippeeBalance.add(amountAsDecimal)
-							console.log("tippeeNewBalance", tippeeNewBalance.toString())
 							walletStore.updateUserBalance(destinationUserID, tippeeNewBalance.toString()).then((result) => {
 								if(result){
 									resolve('Tipped ' + amount + 'XRP')
@@ -35,7 +35,7 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 						})
 					}
 					else{
-						console.log('error: ' + result)
+						logger.error(result)
 					}
 				})
 			}

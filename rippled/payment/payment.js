@@ -69,18 +69,19 @@ function buildSpecification(source, destination){
 
 function preparePaymentTransaction(address, payment){
 	api.connect().then(() => {
-		
-		console.log('getting preparePayment')
+		logger.debug('getting preparePayment')
 		return api.preparePayment(address, payment)
 	}).then(prepared => {
-		console.log(prepared)
-		console.log('preparePayment done')
+		logger.debug(prepared)
+		logger.debug('preparePayment done')
 		signTransaction(prepared.txJSON, constants.DAO_SECRET)
 	}).then(() => {
-		//return api.disconnect()
+		return api.disconnect()
 	}).then(() => {
-		console.log('done and disconnected')
-	}).catch(console.error)
+		logger.debug('done and disconnected')
+	}).catch(error => {
+		logger.error(error)
+	})
 }
 
 module.exports = { 
