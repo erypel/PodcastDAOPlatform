@@ -21,6 +21,47 @@ function Specification(source, destination, allowPartialPayment = false, invoice
 	this.paths = paths
 }
 
+/*
+ * We want payment objects to look like this:
+ * 
+ * payment = { 
+	"source": { 
+		"address": "rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6", 
+		"tag": 1176135248, 
+		"maxAmount": { 
+			"currency": "drops", 
+			"value": "1000000" 
+		} 
+	}, 
+	"destination": { 
+		"address": "rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6", 
+		"amount": { 
+			"currency": "drops", 
+			"value": "1000000" 
+		}, 
+		"tag": 1530675606
+	} 
+}
+
+payment = {
+		  "source": {
+			    "address": "r9cZA1mLK5R5Am25ArfXFmqgNwjZgnfk59",
+			    "maxAmount": {
+			      "value": "0.01",
+			      "currency": "USD",
+			      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+			    }
+			  },
+			  "destination": {
+			    "address": "rpZc4mVfWUif9CRoHRKKcmhu1nx2xktxBo",
+			    "amount": {
+			      "value": "0.01",
+			      "currency": "USD",
+			      "counterparty": "rMH4UxPrbuMa1spCBR98hLLyNJp4d8p4tM"
+			    }
+			  }
+			}
+*/
 function buildSpecification(source, destination){
 	let spec = new Specification(source, destination)
 	return {source: source, destination: destination}

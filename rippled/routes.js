@@ -5,7 +5,7 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
 const podcastStore = require('../podcast/podcastStore')
-const transaction = require('./transaction')
+const transaction = require('./internalTransaction')
 
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded())
