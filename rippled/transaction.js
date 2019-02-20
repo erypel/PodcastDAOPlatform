@@ -10,25 +10,9 @@ const specification = require('./specification')
 const hpc = require('../utils/hastyPuddingCipherUtil')
 const RippleAPI = require('ripple-lib').RippleAPI
 const api = new RippleAPI({
-	//server: 'wss://s1.ripple.com' //public production rippled server
 	server: 'wss://s.altnet.rippletest.net:51233'
 })
-/**
- * Your Credentials
-Address
-rBpMw6fUSV6TnxeAK1wEhuj854ZiTasjtS
-Secret
-sp1C74ibduMAXbBRN6LnXXgguNTDa
-Balance
-10,000 XRP
- */
 
-/**
- * public: rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6
- * secret: snKixQChzs9KcBxxrYWpm97sxnA1e
- */
-const daoAddress = 'rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6'
-const daoSecret = 'snKixQChzs9KcBxxrYWpm97sxnA1e'
 
 //TODO consider re-authentication when moving lots of $$$ https://www.owasp.org/index.php/Transaction_Authorization_Cheat_Sheet	
 	
@@ -124,21 +108,6 @@ function tipUser(sourceUserID, destinationUserID, amount) {
 
 // BEGIN TRANSACTION FLOW METHODS
 //TODO these are nested calls and problems can occur if the api connection is severed too early. need to Un-nest
-function preparePaymentTransaction(address, payment){
-	api.connect().then(() => {
-		
-		console.log('getting preparePayment')
-		return api.preparePayment(address, payment)
-	}).then(prepared => {
-		console.log(prepared)
-		console.log('preparePayment done')
-		signTransaction(prepared.txJSON, daoSecret)
-	}).then(() => {
-		//return api.disconnect()
-	}).then(() => {
-		console.log('done and disconnected')
-	}).catch(console.error)
-}
 
 function signTransaction(txJSON, secret){
 	api.connect().then(() => {
