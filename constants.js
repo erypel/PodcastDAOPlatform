@@ -30,5 +30,25 @@ module.exports = Object.freeze({
 	
 	// ADVERTISEMENT MESSAGES
 	LINK_SUCCESS_MESSAGE: 'Linked!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',
-	UPLOAD_SUCCESS_MESSAGE: 'Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>'
+	UPLOAD_SUCCESS_MESSAGE: 'Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',
+	
+	// XRP CONSTANTS
+	/**
+	 * Your Credentials
+	Address
+	rBpMw6fUSV6TnxeAK1wEhuj854ZiTasjtS
+	Secret
+	sp1C74ibduMAXbBRN6LnXXgguNTDa
+	Balance
+	10,000 XRP
+	 */
+
+	/**
+	 * public: rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6
+	 * secret: snKixQChzs9KcBxxrYWpm97sxnA1e
+	 */
+	DAO_ADDRESS: 'rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6',
+	DAO_SECRET: 'snKixQChzs9KcBxxrYWpm97sxnA1e',
+	TEST_SERVER: 'wss://s.altnet.rippletest.net:51233',
+	PRODUCTION_SERVER: 'wss://s1.ripple.com'//public production rippled server
 })

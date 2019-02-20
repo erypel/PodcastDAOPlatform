@@ -3,29 +3,11 @@
  * https://developers.ripple.com/rippleapi-reference.html#escrow-execution
  */
 const logger = require('../../utils/logger')(__filename)
+const constants = require('../../constants')
 const RippleAPI = require('ripple-lib').RippleAPI
 const api = new RippleAPI({
-	//server: 'wss://s1.ripple.com' //public production rippled server
-	server: 'wss://s.altnet.rippletest.net:51233'
+	server: constants.TEST_SERVER
 })
-
-//TODO consolidate for all Rippled stuff
-/**
- * Your Credentials
-Address
-rBpMw6fUSV6TnxeAK1wEhuj854ZiTasjtS
-Secret
-sp1C74ibduMAXbBRN6LnXXgguNTDa
-Balance
-10,000 XRP
- */
-
-/**
- * public: rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6
- * secret: snKixQChzs9KcBxxrYWpm97sxnA1e
- */
-const daoAddress = 'rwYQjHp9HZiKKpZB4i4fvc8eQvAtA7vdY6'
-const daoSecret = 'snKixQChzs9KcBxxrYWpm97sxnA1e'
 
 /**
  * 
@@ -46,17 +28,19 @@ function Specification(owner, escrowSequence, condition, fulfillment, memos){
 	
 function prepareEscrowExecutionTransaction(address, specification, instructions) {
 	api.connect().then(() => {
-		logger.info('getting prepareEscrowExecution')
+		logger.debug('getting prepareEscrowExecution')
 		return api.prepareEscrowCreation(address, payment)
 	}).then(prepared => {
-		logger.info(prepared)
-		logger.info('prepareEscrowExecution done')
-		signTransaction(prepared.txJSON, daoSecret)
+		logger.debug(prepared)
+		logger.debug('prepareEscrowExecution done')
+		signTransaction(prepared.txJSON, constants.DAO_SECRET)
 	}).then(() => {
-		//return api.disconnect()
+		return api.disconnect()
 	}).then(() => {
-		logger.info('done and disconnected')
-	}).catch(console.error)
+		logger.debug('done and disconnected')
+	}).catch(error => {
+		logger.error(error)
+	})
 }
 
 module.exports = {
