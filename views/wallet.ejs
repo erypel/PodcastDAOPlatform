@@ -9,6 +9,18 @@
 		<h1>UID: <%=userID%> / WID: <%=walletID%>  / <%=funds%> XRP</h1>			
 		<h2>Destination Tag: <%=destinationTag%></h2>
 	</div>
+	<br>
+	<div id="send">
+		<h3>Send your XRP off platform:</h3>
+		<form action="/sendXRP" method="post">
+			<input type="text" placeholder="Amount" name="amount" required>
+			<input type="text" placeholder="Address" name="address" required>
+			<input type="text" placeholder="Destination Tag" name="dest_tag">
+			<input type="hidden" name="walletID" value="<%=walletID%>" >
+			<button>Send XRP</button>
+		</form>
+	</div>
+	<br>
 	<form action="/mapDestinationTag" method = "get">
           <button>Generate Destination Tag</button>
     </form> 
