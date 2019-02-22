@@ -67,8 +67,11 @@ router.post('/sendXRP', session.requireLogin, (req, res) => {
 	})
 })
 
+/*
+ * This is the first step for escrow. Eventually, escrows will be set up automatically based off of ad campaigns
+ */
 router.post('/createEscrow', session.requireLogin, (req, res) => {
-	
+	//actually, this might not be necessary...
 })
 
 router.post('/tip', session.requireLogin, (req, res) => {
