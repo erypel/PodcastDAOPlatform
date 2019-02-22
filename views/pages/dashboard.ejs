@@ -5,6 +5,7 @@
 <title>Dashboard</title>
 </head>
 <body>
+	<%- include('../partials/navbar') %>
 	<h1>Welcome!</h1>
 	<form action="/podcast" method = "get">
           <button>Podcasts</button>
@@ -24,5 +25,6 @@
 	<form action="/logout" method = "get">
           <button>Logout</button>
     </form> 
+    <%- include('../partials/footer') %>
 </body>
 </html>
