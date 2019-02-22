@@ -17,6 +17,7 @@ const logger = require('../utils/logger')(__filename)
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded())
 
+//TODO will eventually want to update the platform's balance
 router.post('/sendXRP', session.requireLogin, (req, res) => {
 	// Get the form values
 	let amountToSend = req.body.amount
@@ -42,12 +43,21 @@ router.post('/sendXRP', session.requireLogin, (req, res) => {
 		}
 	}).then(destinationCheck => {
 		// check that that there are sufficient funds available
+		console.log('dest', destinationCheck)
 		if(destinationCheck === true){
+			/*walletStore.getWalletBalance(walletID).then(balance => {
+				console.log('b', balance)
+				let decimalBalance = new Decimal(balance)
+				let amountBalance = new Decimal(amountToSend)
+		
+				return !decimalBalance.sub(amountBalance).isNegative()
+			})*/
 			return wallet.hasSufficientFunds(walletID, amountToSend)
 		}
 	})//TODO confirm with the user
 	.then(fundsCheck => {
 		// update user's balance
+		console.log('fundsCheck', fundsCheck)
 		if(fundsCheck){
 			let amount = new Decimal(amountToSend)
 			if(amount.isPositive()){
@@ -56,9 +66,11 @@ router.post('/sendXRP', session.requireLogin, (req, res) => {
 				return true
 			}
 		}
-	}).then(()=>{
+	}).then(goodToGo=>{
 		// send
-		payment.sendExternal(amount, destination, destTag)
+		if(goodToGo === true){
+			payment.sendExternal(amountToSend, destinationAddress, destinationTag)
+		}
 	})
 	
 	

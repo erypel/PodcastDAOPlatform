@@ -36,7 +36,7 @@ function validateAddress(address){
 	if(!address.startsWith('r')){
 		return false
 	}
-	let regex = "^[a-hj-zA-HJ-NM-Z1-9]*$"
+	let regex = /^[a-km-zA-HJ-NM-Z1-9]*$/
 	let result = regex.test(address)
 	if(!result){
 		return false
