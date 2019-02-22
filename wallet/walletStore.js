@@ -15,6 +15,16 @@ function getUserBalance(ownerID){
 	})
 }
 
+function getWalletBalance(walletID){
+	return knex.select('funds').table('wallet').where('id', walletID).then(function(rowDataPacket){
+		return rowDataPacket[0].funds
+	})
+}
+
+function updateWalletBalance(walletID, newBalance){
+	return knex('wallet').where({id: walletID}).update({funds: newBalance})
+}
+
 function updateUserBalance(ownerID, newBalance){
 	console.log("owner id:", ownerID)
 	console.log("new balance:", newBalance)
@@ -34,6 +44,8 @@ function createWallet(ownerID){
 module.exports = {
 	getWalletID,
 	getUserBalance,
+	getWalletBalance,
 	updateUserBalance,
+	updateWalletBalance,
 	createWallet
 }

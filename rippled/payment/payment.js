@@ -2,9 +2,12 @@
  * This is the specification for Payment transactions. It specifies what a 
  * transaction should do
  */
-const Source = require('./source')
-const Dest = require('./destination')
+const Source = require('../source')
+const Dest = require('../destination')
+const Amount = require('../amount').Amount
+const Decimal = require('decimal.js')
 const constants = require('../../constants')
+const logger = require('../../utils/logger')(__filename)
 const RippleAPI = require('ripple-lib').RippleAPI
 const api = new RippleAPI({
 	server: constants.TEST_SERVER
@@ -70,11 +73,12 @@ function buildSpecification(source, destination){
 function preparePaymentTransaction(address, payment){
 	api.connect().then(() => {
 		logger.debug('getting preparePayment')
+		console.log(payment)
 		return api.preparePayment(address, payment)
 	}).then(prepared => {
 		logger.debug(prepared)
 		logger.debug('preparePayment done')
-		signTransaction(prepared.txJSON, constants.DAO_SECRET)
+		//signTransaction(prepared.txJSON, constants.DAO_SECRET)
 	}).then(() => {
 		return api.disconnect()
 	}).then(() => {
@@ -84,8 +88,20 @@ function preparePaymentTransaction(address, payment){
 	})
 }
 
+function sendExternal(amount, destination, destTag){
+	logger.info("Sending " + amount + "XRP to " + destination + ":" + destTag)
+	let amountAsDecimal = new Decimal(amount)
+	let amountAsDrops = amountAsDecimal.mul(100000) //convert XRP to drops
+	let sendAmount = new Amount(amountAsDrops.toString())
+	let s = Source.buildSource(constants.DAO_ADDRESS, sendAmount)
+	let d = Dest.buildDestination(destination, sendAmount, destTag)
+	let payment = buildSpecification(s, d)
+	preparePaymentTransaction(constants.DAO_ADDRESS, payment)
+}
+
 module.exports = { 
 		Specification, 
 		buildSpecification, 
-		preparePaymentTransaction 
+		preparePaymentTransaction,
+		sendExternal
 	}

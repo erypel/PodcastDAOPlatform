@@ -5,60 +5,79 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
 const podcastStore = require('../podcast/podcastStore')
+const walletStore = require('../wallet/walletStore')
 const transaction = require('./internalTransaction')
+const Address = require('./address')
+const payment = require('./payment/payment')
+const Decimal = require('decimal.js')
+const wallet = require('../wallet/wallet')
+const session = require('../authentication/session')
+const logger = require('../utils/logger')(__filename)
 
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded())
 
-//BEGIN DUPLICATE METHODS THAT SHOULD BE CONSOLODATED WITH WHATS IN ROUTES.JS
-
-//Middle ware that is specific to this router
-router.use(function timeLog(req, res, next) {
-  next();
-});
-
-//Session middleware
-router.use(function(req, res, next) {
-	//check that a session exists
-	if(req.session && req.session.user){
-		//TODO look for user in DB
-		/*
-		 * if(store.getUser(req.session.user.username)
-		 * 		req.user = user;
-		 * 		delete req.user.password //delete password from the session
-		 * 		req.session.user = user //refresh session value
-		 * 
-		 * 		
-		 */
-		//finish processing the middleware and run the route
-		req.user = req.session.user
-		delete req.user.password
-		delete req.user.encrypted_password
-		next()
-	} else {
-		next()
-	}
+//TODO will eventually want to update the platform's balance
+router.post('/sendXRP', session.requireLogin, (req, res) => {
+	// Get the form values
+	let amountToSend = req.body.amount
+	let destinationAddress = req.body.address
+	let destinationTag = req.body.dest_tag
+	let userID = req.session.user.id
+	let walletID = req.body.walletID
+	
+	// first check that there is nothing screwy going on by looking up the wallet attached to the session user. compare it to the wallet ID that came with the form
+	walletStore.getWalletID(userID).then(result => {
+		if(result === walletID){
+			logger.error("Something critically wrong happened when sending XRP off platform. Session UserID=" + userID + " Form WalletID=" + walletID + " mapped UserID=" + result)
+			res.status(400).send('Something is very wrong!\n<form action="/wallet" method = "get"><button>Return to Wallet</button></form>')
+			return false
+		}
+		else{
+			return true
+		}
+	}).then(walletCheck => {
+		// validate the destination address
+		if(walletCheck === true){
+			return Address.validateAddress(destinationAddress)
+		}
+	}).then(destinationCheck => {
+		// check that that there are sufficient funds available
+		console.log('dest', destinationCheck)
+		if(destinationCheck === true){
+			/*walletStore.getWalletBalance(walletID).then(balance => {
+				console.log('b', balance)
+				let decimalBalance = new Decimal(balance)
+				let amountBalance = new Decimal(amountToSend)
+		
+				return !decimalBalance.sub(amountBalance).isNegative()
+			})*/
+			return wallet.hasSufficientFunds(walletID, amountToSend)
+		}
+	})//TODO confirm with the user
+	.then(fundsCheck => {
+		// update user's balance
+		console.log('fundsCheck', fundsCheck)
+		if(fundsCheck){
+			let amount = new Decimal(amountToSend)
+			if(amount.isPositive()){
+				//TODO get confirmation
+				wallet.subtractFunds(walletID, amountToSend)
+				return true
+			}
+		}
+	}).then(goodToGo=>{
+		// send
+		if(goodToGo === true){
+			payment.sendExternal(amountToSend, destinationAddress, destinationTag)
+		}
+	})
+	
+	
+	
 })
 
-/**
- * check if a user is logged in and redirect them if they're not
- * @param req
- * @param res
- * @param next
- * @returns
- */
-function requireLogin (req, res, next) {
-	console.log("login required")
-  if (!req.user) {
-    res.redirect('/login');
-  } else {
-    next();
-  }
-}
-
-//END DUPLICATES
-
-router.post('/tip', requireLogin, (req, res) => {
+router.post('/tip', session.requireLogin, (req, res) => {
 	let tipperUserID = req.session.user.id
 	let podcastID = req.body.podcastID
 	podcastStore.getUploaderID(podcastID).then((result) => {
