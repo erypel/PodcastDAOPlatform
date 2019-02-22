@@ -73,11 +73,12 @@ function buildSpecification(source, destination){
 function preparePaymentTransaction(address, payment){
 	api.connect().then(() => {
 		logger.debug('getting preparePayment')
+		console.log(payment)
 		return api.preparePayment(address, payment)
 	}).then(prepared => {
 		logger.debug(prepared)
 		logger.debug('preparePayment done')
-		signTransaction(prepared.txJSON, constants.DAO_SECRET)
+		//signTransaction(prepared.txJSON, constants.DAO_SECRET)
 	}).then(() => {
 		return api.disconnect()
 	}).then(() => {
@@ -92,10 +93,10 @@ function sendExternal(amount, destination, destTag){
 	let amountAsDecimal = new Decimal(amount)
 	let amountAsDrops = amountAsDecimal.mul(100000) //convert XRP to drops
 	let sendAmount = new Amount(amountAsDrops.toString())
-	let s = Source.buildSource(constants.DAO_SECRET, sendAmount)
+	let s = Source.buildSource(constants.DAO_ADDRESS, sendAmount)
 	let d = Dest.buildDestination(destination, sendAmount, destTag)
 	let payment = buildSpecification(s, d)
-	preparePaymentTransaction(destination, payment)
+	preparePaymentTransaction(constants.DAO_ADDRESS, payment)
 }
 
 module.exports = { 
