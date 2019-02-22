@@ -45,13 +45,6 @@ router.post('/sendXRP', session.requireLogin, (req, res) => {
 		// check that that there are sufficient funds available
 		console.log('dest', destinationCheck)
 		if(destinationCheck === true){
-			/*walletStore.getWalletBalance(walletID).then(balance => {
-				console.log('b', balance)
-				let decimalBalance = new Decimal(balance)
-				let amountBalance = new Decimal(amountToSend)
-		
-				return !decimalBalance.sub(amountBalance).isNegative()
-			})*/
 			return wallet.hasSufficientFunds(walletID, amountToSend)
 		}
 	})//TODO confirm with the user
@@ -72,8 +65,9 @@ router.post('/sendXRP', session.requireLogin, (req, res) => {
 			payment.sendExternal(amountToSend, destinationAddress, destinationTag)
 		}
 	})
-	
-	
+})
+
+router.post('/createEscrow', session.requireLogin, (req, res) => {
 	
 })
 
