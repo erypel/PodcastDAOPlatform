@@ -4,6 +4,7 @@
  */
 const Source = require('./source')
 const Dest = require('./destination')
+const Decimal = require('decimal.js')
 const constants = require('../../constants')
 const RippleAPI = require('ripple-lib').RippleAPI
 const api = new RippleAPI({
@@ -84,8 +85,19 @@ function preparePaymentTransaction(address, payment){
 	})
 }
 
+function payExternal(amount, destination, destTag){
+	let amountAsDecimal = new Decimal(amount)
+	let amountAsDrops = amountAsDecimal.mul(100000) //convert XRP to drops
+	let sendAmount = new Amount(amountAsDrops.toString())
+	let s = source.buildSource(daoAddress, sendAmount)
+	let d = destination.buildDestination(daoAddress, sendAmount, destTag)
+	let payment = specification.buildSpecification(s, d)
+	preparePaymentTransaction(destination, payment)
+}
+
 module.exports = { 
 		Specification, 
 		buildSpecification, 
-		preparePaymentTransaction 
+		preparePaymentTransaction,
+		payExternal
 	}

@@ -5,7 +5,12 @@ const express = require('express')
 const router = express.Router()
 const bodyParser = require('body-parser')
 const podcastStore = require('../podcast/podcastStore')
+const walletStore = require('../wallet/walletStore')
 const transaction = require('./internalTransaction')
+const Address = require('./address')
+const payment = require('./payment/payment')
+const Decimal = require('decimal.js')
+const wallet = require('../wallet/wallet')
 const session = require('../authentication/session')
 const logger = require('../utils/logger')(__filename)
 
@@ -17,18 +22,47 @@ router.post('/sendXRP', session.requireLogin, (req, res) => {
 	let amountToSend = req.body.amount
 	let destinationAddress = req.body.address
 	let destinationTag = req.body.dest_tag
-	let userID = req.session.userID
+	let userID = req.session.user.id
 	let walletID = req.body.walletID
 	
 	// first check that there is nothing screwy going on by looking up the wallet attached to the session user. compare it to the wallet ID that came with the form
+	walletStore.getWalletID(userID).then(result => {
+		if(result === walletID){
+			logger.error("Something critically wrong happened when sending XRP off platform. Session UserID=" + userID + " Form WalletID=" + walletID + " mapped UserID=" + result)
+			res.status(400).send('Something is very wrong!\n<form action="/wallet" method = "get"><button>Return to Wallet</button></form>')
+			return false
+		}
+		else{
+			return true
+		}
+	}).then(walletCheck => {
+		// validate the destination address
+		if(walletCheck === true){
+			return Address.validateAddress(destinationAddress)
+		}
+	}).then(destinationCheck => {
+		// check that that there are sufficient funds available
+		if(destinationCheck === true){
+			return wallet.hasSufficientFunds(walletID, amountToSend)
+		}
+	})//TODO confirm with the user
+	.then(fundsCheck => {
+		// update user's balance
+		if(fundsCheck){
+			let amount = new Decimal(amountToSend)
+			if(amount.isPositive()){
+				//TODO get confirmation
+				wallet.subtractFunds(walletID, amountToSend)
+				return true
+			}
+		}
+	}).then(()=>{
+		// send
+		payment.sendExternal(amount, destination, destTag)
+	})
 	
-	// validate the destination address
 	
-	// check that that there are sufficient funds available
 	
-	// confirm with user
-	
-	// send
 })
 
 router.post('/tip', session.requireLogin, (req, res) => {
