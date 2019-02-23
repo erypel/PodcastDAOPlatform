@@ -1,0 +1,3 @@
+/**
+ * The truffle config file
+ */
