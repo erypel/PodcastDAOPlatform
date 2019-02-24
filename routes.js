@@ -11,6 +11,7 @@ const utils = require('./utils/utils')
 const constants = require('./constants')
 
 router.use(express.static('authentication'))
+router.use(express.static('voting/voting'))
 router.use(bodyParser.json())
 
 //Middle ware that is specific to this router
