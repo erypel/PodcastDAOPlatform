@@ -65,3 +65,6 @@ uploads/
 
 # generated rss feeds
 rssfeedxml/
+
+# contract builds
+voting/build/
