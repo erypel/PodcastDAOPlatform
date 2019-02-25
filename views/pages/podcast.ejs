@@ -5,6 +5,7 @@
 <title>Podcasts</title>
 </head>
 <body>
+	<%- include('../partials/header') %>
 	<div id="tableDiv">
 		<h2>Podcasts</h2>
 		<table border="1">
@@ -18,7 +19,7 @@
 					<td><a href="http://localhost:3000/play?id=<%=podcast.id%>&path=<%=podcast.path%>"><button>Play</button></a></td>
 					<td>
 						<form action="/tip" method = "post">
-							<input type="hidden" name="podcastID" value=<%=podcast.id%> />
+							<input type="hidden" name="podcastID" value="<%=podcast.id%>" />
           					<button>Tip 1 XRP</button>
     					</form>
     				</td>
@@ -26,12 +27,5 @@
 			<% }) %>
 		</table>
 	</div>
-	<br>
-	<form action="/dashboard" method = "get">
-          <button>Back</button>
-    </form> 
-	<form action="/logout" method = "get">
-          <button>Logout</button>
-    </form>
 </body>
 </html>

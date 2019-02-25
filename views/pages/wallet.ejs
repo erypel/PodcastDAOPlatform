@@ -5,6 +5,7 @@
 <title>Wallet</title>
 </head>
 <body>
+	<%- include(header) %>
 	<div id="balance">	
 		<h1>UID: <%=userID%> / WID: <%=walletID%>  / <%=funds%> XRP</h1>			
 		<h2>Destination Tag: <%=destinationTag%></h2>
@@ -35,12 +36,6 @@
 	<br>
 	<form action="/mapDestinationTag" method = "get">
           <button>Generate Destination Tag</button>
-    </form> 
-	<form action="/dashboard" method = "get">
-          <button>Back</button>
-    </form> 
-	<form action="/logout" method = "get">
-          <button>Logout</button>
     </form>
 </body>
 </html>
