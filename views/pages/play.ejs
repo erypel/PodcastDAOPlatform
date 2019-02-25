@@ -5,6 +5,7 @@
 <title>Play</title>
 </head>
 <body>
+	<%- include('../partials/header') %>
 	<script src="https://unpkg.com/wavesurfer.js"></script>
 	<section id="content">
 		<div id="waveform"></div>
@@ -22,6 +23,7 @@
 			<input type="hidden" name="podcastID" value="<%=podcastID%>"/>
 			<input type="submit" value="Add comment" />
 		</form>
+		<br>
 		<div id="comments">
 			<table border="1">
 			<tr>
@@ -41,15 +43,6 @@
 			<% }) %>
 		</table>
 		</div>
-	</section>
-	<br>
-	<section id="footer">
-		<form action="/podcast" method="get">
-			<button>Back</button>
-		</form>
-		<form action="/logout" method="get">
-			<button>Logout</button>
-		</form>
 	</section>
 
 	<script type="text/javascript">
