@@ -18,6 +18,7 @@ router.get('/uploadAd', session.requireLogin, (req, res) => {
 	res.render(constants.UPLOAD_AD_VIEW)
 })
 
+//TODO consider moving and renaming
 router.get('/getAdCampaignStore', session.requireLogin, (req, res) => {
 	campaignStore.selectAllAdCampaigns().then(campaigns => {
 		adIDs = []

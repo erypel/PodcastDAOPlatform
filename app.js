@@ -14,6 +14,9 @@ app.set('views', [__dirname + '/views/pages', __dirname + '/views/partials'])
 //Static audio files
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
+//frontend stuff goes here
+app.use(express.static(__dirname + '/public'));
+
 //Routes
 app.use(require('./routes'))
 app.use(require('./authentication/routes'))
