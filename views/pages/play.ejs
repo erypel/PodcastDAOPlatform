@@ -25,23 +25,25 @@
 		</form>
 		<br>
 		<div id="comments">
-			<table border="1">
-			<tr>
-				<th>User</th><th>Comment</th><th>Reply</th><th>Tip</th>
-			</tr>
 			<% comments.forEach(function(comment) { %>
-				<tr>
-					<td><%=comment.commenter%></td>
-					<td><%=comment.message%></td>
-					<td><a href=""><button>Reply</button></a></td>
-					<td>
-						<form action="" method = "post">
-          					<button>Tip 1 XRP</button>
-    					</form>
-    				</td>
-				</tr>
+			<div class="top-level-comment">
+				<div class="plus-minus-btns">
+					<!-- Want to implement some sort of comment voting feature -->
+				</div>
+				<div class="comment-block">
+					<div class="user-info">
+						<b><%=comment.commenter%></b>
+					</div>
+					<div class="comment">
+						<p><%=comment.message%></p>
+					</div>
+					<div class="comment-actions">
+						<button type="button">Reply</button>
+						<button type="button">Tip</button>
+					</div>
+				</div>
+			</div>
 			<% }) %>
-		</table>
 		</div>
 	</section>
 
