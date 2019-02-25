@@ -5,6 +5,7 @@
 <title>Upload Ad</title>
 </head>
 <body>
+	<%- include('../partials/advertiserHeader') %>
 	<form action="/uploadAdFile" method="post" enctype="multipart/form-data">
 		<table border="0">
 			<tr>
@@ -26,12 +27,5 @@
             </tr>
 		</table>
 	</form>
-	<br>
-	<form action="/dashboard" method = "get">
-          <button>Back</button>
-    </form> 
-	<form action="/logout" method = "get">
-          <button>Logout</button>
-    </form>
 </body>
 </html>
