@@ -22,6 +22,7 @@ function buildCommentSectionDataObject(comments){
 						commentObj.message = currentComment.comment
 						commentObj.id = currentComment.id
 						commentObj.replyTo = currentComment.comment_id // the id of the comment this is a reply to
+						commentObj.depth = currentComment.depth
 						if(commentObj.replyTo === -1) {
 							commentSectionDataObject.push(commentObj)
 						}

@@ -13,7 +13,8 @@ function insertComment(comment){
 		comment: comment.comment,
 		comment_id: comment.respondingTo,
 		podcast_id: comment.podcastID,
-		commenter_id: comment.userID
+		commenter_id: comment.userID,
+		depth: comment.depth
 	})
 }
 

@@ -22,12 +22,13 @@
 		<form action="/comment" method="post" id="postCommentForm" onsubmit="refreshComments()">
 			<input type="text" name="comment" placeholder="Add to the discussion..." required />
 			<input type="hidden" name="podcastID" value="<%=podcastID%>"/>
+			<input type="hidden" name="depth" value="0"/>
 			<input type="submit" value="Add comment" />
 		</form>
 		<br>
 		<div id="comments">
 			<% comments.forEach(function(comment) { %>
-			<div class="top-level-comment">
+			<div class="<%='level-'+ comment.depth +'-comment'%>">
 				<div class="plus-minus-btns">
 					<!-- Want to implement some sort of comment voting feature -->
 				</div>
@@ -47,6 +48,7 @@
 							<input type="text" name="comment" placeholder="Reply..." required />
 							<input type="hidden" name="podcastID" value="<%=podcastID%>"/>
 							<input type="hidden" name="respondingTo" value="<%=comment.id%>" />
+							<input type="hidden" name="depth" value="<%=comment.depth +1%>" />
 							<input type="submit" value="Reply" />
 						</form>
 					</div>

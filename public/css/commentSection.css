@@ -1,3 +1,20 @@
+/* nested comments */
+.level-0-comment {
+	margin-left: 0px;
+}
+.level-1-comment {
+	margin-left: 20px;
+}
+.level-2-comment {
+	margin-left: 40px;
+}
+.level-3-comment {
+	margin-left: 60px;
+}
+.level-4-comment {
+	margin-left: 80px;
+}
+
 /* a whole comment block including user info, comment text, and actions */
 .comment-block {
 	width: 75%;
