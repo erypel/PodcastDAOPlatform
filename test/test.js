@@ -4,6 +4,7 @@ const assert = require('assert')
 const constants = require('../constants')
 const userStore = require('../authentication/userStore')
 const walletStore = require('../wallet/walletStore')
+const Wallet = require('../wallet/wallet')
 
 function test(){
 	return 1
@@ -128,6 +129,157 @@ describe('Test that createWallet() creates a wallet for a user', function() {
 		}).then(wallet => {
 			//CLEANUP
 			walletStore.deleteWallet(wallet.id).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+describe('Test that getWallet() returns an object', function() {
+	it('Should return an object', function(done){
+		// ARRANGE
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id =>{
+				expectedUserID = id
+				return id
+			})
+		}).then(id => {
+			//ACT
+			return walletStore.createWallet(id)
+		}).then(result => {
+			let walletID = result.id
+			return walletID
+		}).then(walletID => {
+			return walletStore.getWallet(walletID)
+		}).then(wallet => {
+			//ASSERT
+			expect(wallet).to.be.an('object')
+			return wallet
+		}).then(wallet => {
+			//CLEANUP
+			console.log('wallet', wallet)
+			walletStore.deleteWallet(wallet.id).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+describe('getWalletID(ownerID)', function() {
+	it('Should get the ID of a user\'s wallet', function(done) {
+		// ARRANGE
+		let expectedWalletID = -1
+		let userID = -1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id =>{
+				userID = id
+				return id
+			})
+		}).then(id => {
+			return walletStore.createWallet(id)
+		}).then(result => {
+			expectedWalletID = result.id
+			return
+		}).then(() => {
+			//ACT
+			return walletStore.getWalletID(userID)
+		}).then(walletID => {
+			//ASSERT
+			expect(expectedWalletID).to.be.equal(walletID)
+			return expectedWalletID
+		}).then(walletID => {
+			//CLEANUP
+			walletStore.deleteWallet(walletID).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+describe('getUserBalance(ownerID)', function() {
+	it('Should return the balance of a newly created wallet', function(done) {
+		// ARRANGE
+		let expectedValue = '0.00000000'
+		let walletID = -1
+		let userID = -1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id => {
+				userID = id
+			})
+		}).then(() => {
+			return walletStore.createWallet(userID).then(result => {
+				walletID = result.id
+				return
+			})
+		}).then(() => {
+			//ACT
+			return walletStore.getUserBalance(userID)
+		}).then(funds => {
+			//ASSERT
+			expect(expectedValue).to.be.equal(funds)
+			return
+		}).then(() => {
+			//CLEANUP
+			walletStore.deleteWallet(walletID).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+describe('getWalletBalance(walletID)', function() {
+	it('Should return the balance of a newly created wallet', function(done) {
+		// ARRANGE
+		let expectedValue = '0.00000000'
+		let walletID = -1
+		let userID = -1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id => {
+				userID = id
+			})
+		}).then(() => {
+			return walletStore.createWallet(userID).then(result => {
+				walletID = result.id
+				return
+			})
+		}).then(() => {
+			//ACT
+			return walletStore.getWalletBalance(walletID)
+		}).then(funds => {
+			//ASSERT
+			expect(expectedValue).to.be.equal(funds)
+			return
+		}).then(() => {
+			//CLEANUP
+			walletStore.deleteWallet(walletID).then(() => {
 				return
 			}).then(() => {
 				return userStore.deleteTestUsers()

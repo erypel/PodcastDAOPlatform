@@ -47,16 +47,6 @@ function createWallet(ownerID){
 	})
 }
 
-function createTestWallet(testUserID){
-	logger.debug('Creating test wallet for test user with ID::' + testUserID)
-	return knex(constants.WALLET_TABLE).insert({
-		owner_id: testUserID
-	}, 'id').then(id => {
-		logger.debug('Created wallet with ID::' + id)
-		return id
-	})
-}
-
 /**
  * THIS FUNCTION SHOULD REALLY ONLY BE USED FOR TESTING
  * @param id
