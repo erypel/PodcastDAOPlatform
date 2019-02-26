@@ -26,4 +26,8 @@ router.post('/comment', session.requireLogin, (req, res) => {
 	})
 })
 
+router.post('/reply', session.requireLogin, (req, res) => {
+	
+})
+
 module.exports = router

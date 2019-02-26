@@ -19,6 +19,7 @@ function buildCommentSectionDataObject(comments){
 						username = result[0].username
 						commentObj.commenter = username
 						commentObj.message = currentComment.comment
+						commentObj.id = currentComment.id
 						commentSectionDataObject.push(commentObj)
 						if(i === comments.length - 1){
 							//TODO commentSectionDataObject will eventually need to be sorted
