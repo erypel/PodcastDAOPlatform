@@ -139,6 +139,40 @@ describe('Test that createWallet() creates a wallet for a user', function() {
 	})
 })
 
+describe('deleteWallet(walletID)', function() {
+	it('Should delete the specified wallet', function(done) {
+		// ARRANGE
+		let userID = -1
+		let walletID = -1
+		let expectNumberOfRowsDeleted = 1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id =>{
+				userID = id
+				return
+			})
+		}).then(() => {
+			return walletStore.createWallet(userID)
+		}).then(result => {
+			walletID = result.id
+			return
+		}).then(() => {
+			//ACT
+			return walletStore.deleteWallet(walletID)
+		}).then(result => {
+			//ASSERT
+			expect(expectNumberOfRowsDeleted).to.be.equal(result)
+			return
+		}).then(() => {
+			return userStore.deleteTestUsers()
+		}).then(() => {
+			done()
+		})
+	})
+})
+
 describe('Test that getWallet() returns an object', function() {
 	it('Should return an object', function(done){
 		// ARRANGE
@@ -272,6 +306,86 @@ describe('getWalletBalance(walletID)', function() {
 			})
 		}).then(() => {
 			//ACT
+			return walletStore.getWalletBalance(walletID)
+		}).then(funds => {
+			//ASSERT
+			expect(expectedValue).to.be.equal(funds)
+			return
+		}).then(() => {
+			//CLEANUP
+			walletStore.deleteWallet(walletID).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+describe('updateWalletBalance(walletID, newBalance)', function() {
+	it('Should update the balance of a wallet', function(done) {
+		// ARRANGE
+		let expectedValue = '0.00000001'
+		let walletID = -1
+		let userID = -1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id => {
+				userID = id
+			})
+		}).then(() => {
+			return walletStore.createWallet(userID).then(result => {
+				walletID = result.id
+				return
+			})
+		}).then(() => {
+			//ACT
+			return walletStore.updateWalletBalance(walletID, expectedValue)
+		}).then(() => {
+			return walletStore.getWalletBalance(walletID)
+		}).then(funds => {
+			//ASSERT
+			expect(expectedValue).to.be.equal(funds)
+			return
+		}).then(() => {
+			//CLEANUP
+			walletStore.deleteWallet(walletID).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+describe('updateUserBalance(ownerID, newBalance)', function() {
+	it('Should update the balance of a user\'s wallet', function(done) {
+		// ARRANGE
+		let expectedValue = '0.00000001'
+		let walletID = -1
+		let userID = -1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id => {
+				userID = id
+			})
+		}).then(() => {
+			return walletStore.createWallet(userID).then(result => {
+				walletID = result.id
+				return
+			})
+		}).then(() => {
+			//ACT
+			return walletStore.updateUserBalance(userID, expectedValue)
+		}).then(() => {
 			return walletStore.getWalletBalance(walletID)
 		}).then(funds => {
 			//ASSERT

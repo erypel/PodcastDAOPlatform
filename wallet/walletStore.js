@@ -32,8 +32,6 @@ function updateWalletBalance(walletID, newBalance){
 }
 
 function updateUserBalance(ownerID, newBalance){
-	console.log("owner id:", ownerID)
-	console.log("new balance:", newBalance)
 	return knex(constants.WALLET_TABLE).where({owner_id: ownerID}).update({funds: newBalance})
 }
 
