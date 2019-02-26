@@ -88,6 +88,7 @@ function authenticate ({ username, password }) {
 //BEGIN CRUD FUNCTIONS
 //TODO make sure we are storing passwords in a secure fashion:
 //https://www.owasp.org/index.php/Password_Storage_Cheat_Sheet
+//TODO make sure that a user is not being created with any test user credentials
 function createUser ({username, email, password, profile}) {
 	// As per OWASP recommendations, User IDs should be case insensitive, so
 	// we'll store them in lower case
@@ -99,13 +100,17 @@ function createUser ({username, email, password, profile}) {
 		email,
 		salt,
 		encrypted_password: hash,
-		profile: profile
+		profile
 	}, 'id') // returns id in order to generate wallet
 }
 
 function getUser(username){
 	username = username.toLowerCase() // username should be lower case in the DB
 	return knex(constants.USER_TABLE).where({username: username}).first()
+}
+
+function getUserByID(id){
+	return knex(constants.USER_TABLE).where({id: id}).first()
 }
 
 function getUserID(username) {
@@ -117,12 +122,54 @@ function getUsername(userID){
 	return knex(constants.USER_TABLE).select('username').where({id: userID})
 }
 
+function createTestUser(){
+	logger.debug('Creating test user')
+	let username = constants.USERNAME_FOR_TESTING
+	let email = constants.EMAIL_FOR_TESTING
+	let password = constants.PASSWORD_FOR_TESTING
+	let profile = constants.PROFILE_FOR_TESTING
+	const {salt, hash} = utils.saltHashPassword({password})
+	return knex(constants.USER_TABLE).insert({
+		username,
+		email,
+		salt,
+		encrypted_password: hash,
+		profile
+	}, 'id').then(id => {
+		logger.debug('Created test user with id::' + id)
+		return id
+	})
+}
+
+function deleteTestUsers(){
+	logger.debug('Deleting test user')
+	return knex(constants.USER_TABLE).where({
+		username: constants.USERNAME_FOR_TESTING,
+		email: constants.EMAIL_FOR_TESTING,
+		profile: constants.PROFILE_FOR_TESTING
+	}).del().then(result => {
+		if(result === 0){
+			logger.warn('No test users were deleted.')
+		}
+		else if(result > 1){
+			logger.warn(result + ' test users were deleted. Something might have to be cleaned up. Only 1 should be deleted at a time')
+		}
+		else{
+			logger.debug('Successfully deleted ONE test user')
+		}
+		return result
+	})
+}
+
 //END CRUD FUNCTIONS
 
 module.exports = {
 		createUser,
 		authenticate,
 		getUser,
+		getUserByID,
 		getUserID,
-		getUsername
+		getUsername,
+		createTestUser,
+		deleteTestUsers
 }

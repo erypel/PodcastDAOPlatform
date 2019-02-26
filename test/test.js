@@ -1,6 +1,8 @@
-var expect = require('chai').expect;
-var crypto = require('crypto')
-const assert = require('assert');
+const expect = require('chai').expect
+const crypto = require('crypto')
+const assert = require('assert')
+const constants = require('../constants')
+const userStore = require('../authentication/userStore')
 
 function test(){
 	return 1
@@ -38,5 +40,56 @@ describe('Check crypto Hashes for ripemd160', function() {
 		
 		//ASSERT
 		expect(crypto.getHashes().includes('ripemd160')).to.be.equal(true)
+	})
+})
+
+describe('Testing that createTestUser() creates a test user', function() {
+	return it('A user should be created with the test parameters', function(done) {
+		// ARRANGE
+		let expectedUsername = constants.USERNAME_FOR_TESTING
+		let expectedEmail = constants.EMAIL_FOR_TESTING
+		let expectedProfile = constants.PROFILE_FOR_TESTING
+		userStore.deleteTestUsers().then( () => {
+			return
+		}).then(() => {
+			//ACT
+			userStore.createTestUser().then(id => {
+				return userStore.getUserByID(id)
+			}).then(user => {
+				//ASSERT
+				expect(user.username).to.be.equal(expectedUsername)
+				expect(user.email).to.be.equal(expectedEmail)
+				expect(user.profile).to.be.equal(expectedProfile)
+				
+				//CLEAN UP
+				userStore.deleteTestUsers().then(() => {
+					done()
+				})
+			})	
+		})
+	})
+})
+
+describe('Test that deleteTestUsers() deletes all test users', function() {
+	it('3 test users should be deleted after creating 3 test users', function(done) {
+		// ARRANGE
+		let expected = 3
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			//create 3 test users
+			userStore.createTestUser().then(() => {
+				userStore.createTestUser()
+			}).then(() => {
+				userStore.createTestUser()
+			}).then(() => {
+				//ACT
+				userStore.deleteTestUsers().then(result => {
+					//ASSERT
+					expect(result).to.be.equal(expected)
+					done()
+				})
+			})
+		})
 	})
 })

@@ -2,6 +2,7 @@
  * http://usejsdoc.org/
  */
 const knex = require('knex')(require('../knexfile'))
+const logger = require('../utils/logger')(__filename)
 
 function getWalletID(ownerID){
 	return knex.select('id').table('wallet').where('owner_id', ownerID).then(function(rowDataPacket){
@@ -32,14 +33,18 @@ function updateUserBalance(ownerID, newBalance){
 }
 
 function createWallet(ownerID){
-	console.log(`Creating wallet for user with ID: ${ownerID}`)
+	logger.info('Creating wallet for user with ID::' + ownerID)
 	return knex('wallet').insert({
 		owner_id: ownerID
-	}).then(function (result) { //then() is necessary because it coerces the current query builder chain into a promise state
-		console.log("Wallet successfully created.")
+	}).then(function (result) {
+		logger.info('Created wallet with ID::' + result[0] + 'for userID::' + ownerID)
 		return {success: true}
 	})
 }
+
+function createTestWallet(){}
+
+function deleteTestWallet(){}
 
 module.exports = {
 	getWalletID,

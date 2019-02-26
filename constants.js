@@ -18,6 +18,12 @@ module.exports = Object.freeze({
 	CONTENT_CREATOR_USER_PROFILE: 'CONTENT_CREATOR',
 	ADVERTISER_USER_PROFILE: 'ADVERTISER',
 	
+	//TEST USER CREDENTIALS
+	USERNAME_FOR_TESTING: 'testusername',
+	EMAIL_FOR_TESTING: 'test@test.com',
+	PASSWORD_FOR_TESTING: 'ABCabc123!',
+	PROFILE_FOR_TESTING: 'TEST',
+	
 	// GENERIC MESSAGES
 	SUCCESS_AND_RETURN_TO_DASHBOARD: 'Success!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',
 	
@@ -31,6 +37,7 @@ module.exports = Object.freeze({
 	// ADVERTISEMENT MESSAGES
 	LINK_SUCCESS_MESSAGE: 'Linked!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',
 	UPLOAD_SUCCESS_MESSAGE: 'Uploaded!\n<form action="/dashboard" method = "get"><button>Return to Dashboard</button></form>',
+	
 	
 	// XRP CONSTANTS
 	/**
