@@ -13,6 +13,7 @@ module.exports = Object.freeze({
 	ADVERTISEMENT_TABLE: 'advertisement',
 	AD_LINK_TABLE: 'adlink',
 	USER_TABLE: 'user',
+	WALLET_TABLE: 'wallet',
 	
 	// USER PROFILES
 	CONTENT_CREATOR_USER_PROFILE: 'CONTENT_CREATOR',

@@ -3,6 +3,7 @@ const crypto = require('crypto')
 const assert = require('assert')
 const constants = require('../constants')
 const userStore = require('../authentication/userStore')
+const walletStore = require('../wallet/walletStore')
 
 function test(){
 	return 1
@@ -42,6 +43,8 @@ describe('Check crypto Hashes for ripemd160', function() {
 		expect(crypto.getHashes().includes('ripemd160')).to.be.equal(true)
 	})
 })
+
+// BEGIN AUTHENTICATION TESTS
 
 describe('Testing that createTestUser() creates a test user', function() {
 	return it('A user should be created with the test parameters', function(done) {
@@ -93,3 +96,46 @@ describe('Test that deleteTestUsers() deletes all test users', function() {
 		})
 	})
 })
+
+// END AUTHENTICATION TESTS
+
+// BEGIN WALLET TESTS
+
+describe('Test that createWallet() creates a wallet for a user', function() {
+	it('Should create a wallet linked to a user ID', function(done) {
+		// ARRANGE
+		let expectedUserID = -1
+		userStore.deleteTestUsers().then(() => {
+			return
+		}).then(() => {
+			// create a test user
+			return userStore.createTestUser().then(id =>{
+				expectedUserID = id
+				return id
+			})
+		}).then(id => {
+			//ACT
+			return walletStore.createWallet(id)
+		}).then(result => {
+			let walletID = result.id
+			return walletID
+		}).then(walletID => {
+			return walletStore.getWallet(walletID)
+		}).then(wallet => {
+			//ASSERT
+			expect(expectedUserID).to.be.equal(wallet.owner_id)
+			return wallet
+		}).then(wallet => {
+			//CLEANUP
+			walletStore.deleteWallet(wallet.id).then(() => {
+				return
+			}).then(() => {
+				return userStore.deleteTestUsers()
+			}).then(() => {
+				done()
+			})
+		})
+	})
+})
+
+// END WALLET TESTS

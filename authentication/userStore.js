@@ -136,8 +136,8 @@ function createTestUser(){
 		encrypted_password: hash,
 		profile
 	}, 'id').then(id => {
-		logger.debug('Created test user with id::' + id)
-		return id
+		logger.debug('Created test user with id::' + id[0])
+		return id[0]
 	})
 }
 
