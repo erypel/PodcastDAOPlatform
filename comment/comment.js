@@ -6,6 +6,7 @@ function buildCommentSectionDataObject(comments){
 			resolve([])
 		}
 		let commentSectionDataObject = []
+		let replies = []
 		let promiseChain = Promise.resolve()
 		let currentComment;
 		for(let i = 0; i < comments.length; i++){
@@ -20,11 +21,33 @@ function buildCommentSectionDataObject(comments){
 						commentObj.commenter = username
 						commentObj.message = currentComment.comment
 						commentObj.id = currentComment.id
-						commentSectionDataObject.push(commentObj)
+						commentObj.replyTo = currentComment.comment_id // the id of the comment this is a reply to
+						if(commentObj.replyTo === -1) {
+							commentSectionDataObject.push(commentObj)
+						}
+						else{
+							replies.push(commentObj)
+						}
+						//TODO commentSectionDataObject will eventually need to be sorted
 						if(i === comments.length - 1){
-							//TODO commentSectionDataObject will eventually need to be sorted
-							console.log('commentSectionDataObject', commentSectionDataObject)
-							resolve(commentSectionDataObject)
+							if(replies.length === 0){
+								console.log('commentSectionDataObject', commentSectionDataObject)
+								resolve(commentSectionDataObject)
+							}
+							for(let j = 0; j < replies.length; j++){
+								let currReply = replies[j]
+								//TODO this should be a hash instead of a bunch of nested loops. will fix on the refactor
+								for(let k = 0; k < commentSectionDataObject.length; k++){
+									if(commentSectionDataObject[k].id === currReply.replyTo){
+										commentSectionDataObject.splice(k+1, 0, currReply)
+										break
+									}
+								}
+								if(j === replies.length -1){
+									console.log('commentSectionDataObject', commentSectionDataObject)
+									resolve(commentSectionDataObject)
+								}
+							}
 						}
 					})
 			}
