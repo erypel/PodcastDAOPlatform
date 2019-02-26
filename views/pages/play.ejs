@@ -3,6 +3,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Play</title>
+<link href="/css/commentSection.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 	<%- include('../partials/header') %>
@@ -38,11 +39,12 @@
 						<p><%=comment.message%></p>
 					</div>
 					<div class="comment-actions">
-						<button type="button">Reply</button>
-						<button type="button">Tip</button>
+						<button type="button" class="comment-action">Reply</button>
+						<button type="button" class="comment-action">Tip</button>
 					</div>
 				</div>
 			</div>
+			<br>
 			<% }) %>
 		</div>
 	</section>

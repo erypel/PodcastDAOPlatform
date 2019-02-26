@@ -1,0 +1,20 @@
+/* a whole comment block including user info, comment text, and actions */
+.comment-block {
+	width: 75%;
+}
+
+.comment {
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+.comment p {
+	margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.comment-action {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: gray;
+}
