@@ -3,8 +3,10 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Play</title>
+<link href="/css/commentSection.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+	<%- include('../partials/header') %>
 	<script src="https://unpkg.com/wavesurfer.js"></script>
 	<section id="content">
 		<div id="waveform"></div>
@@ -17,41 +19,46 @@
 	<br>
 	<section id="discussion">
 		<h3>Discussion Section</h3>
-		<form action="/comment" method="post" id="postCommentForm" onsubmit="refreshComments()"'>
+		<form action="/comment" method="post" id="postCommentForm" onsubmit="refreshComments()">
 			<input type="text" name="comment" placeholder="Add to the discussion..." required />
 			<input type="hidden" name="podcastID" value="<%=podcastID%>"/>
+			<input type="hidden" name="depth" value="0"/>
 			<input type="submit" value="Add comment" />
 		</form>
+		<br>
 		<div id="comments">
-			<table border="1">
-			<tr>
-				<th>User</th><th>Comment</th><th>Reply</th><th>Tip</th>
-			</tr>
 			<% comments.forEach(function(comment) { %>
-				<tr>
-					<td><%=comment.commenter%></td>
-					<td><%=comment.message%></td>
-					<td><a href=""><button>Reply</button></a></td>
-					<td>
-						<form action="" method = "post">
-          					<button>Tip 1 XRP</button>
-    					</form>
-    				</td>
-				</tr>
+			<div class="<%='level-'+ comment.depth +'-comment'%>">
+				<div class="plus-minus-btns">
+					<!-- Want to implement some sort of comment voting feature -->
+				</div>
+				<div class="comment-block">
+					<div class="user-info">
+						<b><%=comment.commenter%></b>
+					</div>
+					<div class="comment">
+						<p><%=comment.message%></p>
+					</div>
+					<div class="comment-actions">
+						<button type="button" class="comment-action" id="<%='reply-' + comment.id%>" onclick="openCollapsableComment(this)">Reply</button>
+						<button type="button" class="comment-action">Tip</button>
+					</div>
+					<div class="reply">
+  						<form action="/comment" method="post" id="replyCommentForm" onsubmit="">
+							<input type="text" name="comment" placeholder="Reply..." required />
+							<input type="hidden" name="podcastID" value="<%=podcastID%>"/>
+							<input type="hidden" name="respondingTo" value="<%=comment.id%>" />
+							<input type="hidden" name="depth" value="<%=comment.depth +1%>" />
+							<input type="submit" value="Reply" />
+						</form>
+					</div>
+				</div>
+			</div>
+			<br>
 			<% }) %>
-		</table>
 		</div>
 	</section>
-	<br>
-	<section id="footer">
-		<form action="/podcast" method="get">
-			<button>Back</button>
-		</form>
-		<form action="/logout" method="get">
-			<button>Logout</button>
-		</form>
-	</section>
-
+	<script type="text/javascript" src="/js/replyToComment.js"></script>
 	<script type="text/javascript">
 		function refreshComments(){
 			//TODO

@@ -1,0 +1,59 @@
+/* nested comments */
+.level-0-comment {
+	margin-left: 0px;
+}
+.level-1-comment {
+	margin-left: 20px;
+}
+.level-2-comment {
+	margin-left: 40px;
+}
+.level-3-comment {
+	margin-left: 60px;
+}
+.level-4-comment {
+	margin-left: 80px;
+}
+
+/* a whole comment block including user info, comment text, and actions */
+.comment-block {
+	width: 75%;
+}
+
+.comment {
+	font-family: Verdana, Geneva, sans-serif;
+}
+
+.comment p {
+	margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.comment-action {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: gray;
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+/* Style the collapsible reply. Note: hidden by default */
+.reply {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
