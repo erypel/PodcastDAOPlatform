@@ -9,7 +9,7 @@ const logger = require('./utils/logger')(__filename)
 logger.info('Logger is initialized.')
 
 app.set('view engine', 'ejs');
-app.set('views', [__dirname + '/views/pages', __dirname + '/views/partials'])
+app.set('views', [__dirname + '/public/views/pages', __dirname + '/public/views/partials'])
 
 //Static audio files
 app.use('/uploads', express.static(__dirname + '/uploads'));
