@@ -4,16 +4,11 @@
  * the lowercase letter r.
  */
 const Sequence = require('./sequence')
-const crypto = require('crypto')
+const cryptoUtils = require('../utils/cryptoUtils')
 
 function Address(address){
 	this.address = address
 	this.sequence = new Sequence()
-}
-
-function verifyChecksum(){
-	//TODO 
-	return true
 }
 
 /**
@@ -41,7 +36,7 @@ function validateAddress(address){
 	if(!result){
 		return false
 	}
-	return verifyChecksum()
+	return cryptoUtils.verifyChecksum(address)
 }
 
 module.exports = {
