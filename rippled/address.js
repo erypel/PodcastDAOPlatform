@@ -4,40 +4,11 @@
  * the lowercase letter r.
  */
 const Sequence = require('./sequence')
-const crypto = require('crypto')
-const BASE58 = 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
-const baseX = require('base-x')(BASE58)
+const cryptoUtils = require('../utils/cryptoUtils')
 
 function Address(address){
 	this.address = address
 	this.sequence = new Sequence()
-}
-
-function toHex(num){
-	let hex = Math.round(num).toString(16);
-    if(hex.length === 1) {
-        hex = '0' + hex;
-    }
-    return hex;
-}
-
-function bytesToHex(bytes){
-	 let hex = '';
-     for(var i = 0; i < bytes.length; i++) {
-         hex += toHex(bytes[i]);
-     }
-     return hex;
-}
-
-function sha256(bytes) {
-	return crypto.createHash('sha256').update(bytes).digest()
-}
-
-function verifyChecksum(address){
-	let bytes = baseX.decode(address)
-	let computedChecksum = bytesToHex(sha256(sha256(bytes.slice(0, -4)))).slice(0, 8)
-	let checksum = bytesToHex(bytes.slice(-4))
-	return computedChecksum === checksum
 }
 
 /**
@@ -65,7 +36,7 @@ function validateAddress(address){
 	if(!result){
 		return false
 	}
-	return verifyChecksum(address)
+	return cryptoUtils.verifyChecksum(address)
 }
 
 module.exports = {
